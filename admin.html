@@ -290,18 +290,43 @@ let editingProductId = null;
 let uploadedImageUrl = null;
 
 // AUTH
-db.auth.onAuthStateChange(async (_e, session) => {
+// AUTH STATE - only handles UI visibility
+db.auth.onAuthStateChange((_e, session) => {
   adminUser = session?.user || null;
-  if (adminUser) {
-    // Check if user has admin role
-    const { data: profile } = await db.from('customers').select('is_admin').eq('id', adminUser.id).single();
-    if (!profile?.is_admin) {
-      await db.auth.signOut();
-      document.getElementById('admin-login-error').textContent = 'Access denied. You are not an admin.';
-      return;
-    }
-    document.getElementById('login-screen').classList.add('hidden');
-    await loadAll();
+  if (!adminUser) {
+    document.getElementById('login-screen').classList.remove('hidden');
+  }
+  // Don't do async admin checks here — handle in the login button
+});
+
+// LOGIN BUTTON - handles full login + admin check
+document.getElementById('admin-login-btn').onclick = async () => {
+  const email = document.getElementById('admin-email').value.trim();
+  const pass  = document.getElementById('admin-password').value;
+  const err   = document.getElementById('admin-login-error');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Please fill in all fields.'; return; }
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) { err.textContent = error.message; return; }
+
+  // Check admin role after successful login
+  const { data: profile } = await db.from('customers')
+    .select('is_admin')
+    .eq('id', data.user.id)
+    .single();
+
+  if (!profile?.is_admin) {
+    await db.auth.signOut();
+    err.textContent = 'Access denied. You are not an admin.';
+    return;
+  }
+
+  // All good — show dashboard
+  adminUser = data.user;
+  document.getElementById('login-screen').classList.add('hidden');
+  await loadAll();
+};
   } else {
     document.getElementById('login-screen').classList.remove('hidden');
   }
