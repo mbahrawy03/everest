@@ -161,11 +161,14 @@ function renderProducts() {
       ? `${oldPrice}<span class="sale-price">EGP ${p.price.toLocaleString()}</span>`
       : `EGP ${p.price.toLocaleString()}`;
     const tagHtml = p.tag ? `<span class="card-tag tag-${p.tag}">${p.tag}</span>` : '';
+    const imgHtml = p.image_url
+      ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;"/>`
+      : `<div class="product-emoji">${p.emoji || '👕'}</div>`;
     return `
       <div class="product-card" data-id="${p.id}">
         <div class="product-img">
           ${tagHtml}
-          <div class="product-emoji">${p.emoji || '👕'}</div>
+          ${imgHtml}
           <div class="card-overlay"><button class="quick-view">Quick View</button></div>
         </div>
         <div class="card-info">
@@ -199,7 +202,9 @@ function openProduct(id) {
   document.getElementById('modal-name').textContent  = currentProduct.name;
   document.getElementById('modal-desc').textContent  = currentProduct.description || '';
   document.getElementById('modal-price').textContent = `EGP ${currentProduct.price.toLocaleString()}`;
-  document.getElementById('modal-img').innerHTML     = `<div style="font-size:6rem;opacity:0.6">${currentProduct.emoji || '👕'}</div>`;
+  document.getElementById('modal-img').innerHTML = currentProduct.image_url
+    ? `<img src="${currentProduct.image_url}" alt="${currentProduct.name}" style="width:100%;height:100%;object-fit:cover;min-height:400px;"/>`
+    : `<div style="font-size:6rem;opacity:0.6">${currentProduct.emoji || '👕'}</div>`;
 
   const stock = currentProduct.stock || 0;
   const stockEl = document.getElementById('modal-stock');
