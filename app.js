@@ -336,6 +336,7 @@ function openProduct(id) {
       document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       selectedSize = btn.dataset.size;
+      updateStockDisplay();
     });
   });
   if (sizes.length === 1) {
