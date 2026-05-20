@@ -573,12 +573,35 @@ async function handleCheckout() {
 
   // Decrement inventory for each item
   for (const item of orderItems) {
-    await db.from('inventory')
-      .update({ stock: db.raw(`stock - ${item.qty}`) })
-      .eq('product_id', item.product_id)
-      .eq('size', item.size)
-      .eq('color', item.color);
+
+  // Get current inventory row
+  const { data: inventoryItem, error } = await db
+    .from('inventory')
+    .select('*')
+    .eq('product_id', item.product_id)
+    .eq('size', item.size)
+    .eq('color', item.color)
+    .single();
+
+  if (error || !inventoryItem) {
+    console.error('Inventory item not found');
+    continue;
   }
+
+  // Prevent negative stock
+  if (inventoryItem.stock < item.qty) {
+    alert(`Not enough stock for ${item.name}`);
+    continue;
+  }
+
+  // Update stock
+  await db
+    .from('inventory')
+    .update({
+      stock: inventoryItem.stock - item.qty
+    })
+    .eq('id', inventoryItem.id);
+}
 
   localStorage.setItem('everest_checkout_order', JSON.stringify({
     orderId: orderData.id, total, items: orderItems,
