@@ -538,7 +538,8 @@ document.getElementById('p-images').addEventListener('change', async e => {
   stat.classList.remove('hidden');
   let uploaded = 0;
   for (const file of files) {
-    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name.replace(/\s/g,'_')}`;
+    const ext = file.name.split('.').pop().toLowerCase();
+const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const { error } = await db.storage.from('products').upload(fileName, file, { upsert: true });
     if (!error) {
       const { data: urlData } = db.storage.from('products').getPublicUrl(fileName);
