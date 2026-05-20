@@ -577,7 +577,8 @@ async function handleCheckout() {
   if (error) { alert('Could not create order. Please try again.'); console.error(error); return; }
 
   // Send order confirmation email
-  await db.functions.invoke('send-order-email', {
+  console.log('Sending email for order:', orderData.id);
+  const { data: emailData, error: emailError } = await db.functions.invoke('send-order-email', {
     body: {
       order: { ...orderData, status: 'pending' },
       customer: { email: currentUser.email, name: currentUser.user_metadata?.full_name || '' },
