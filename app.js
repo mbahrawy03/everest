@@ -255,7 +255,7 @@ function openProduct(id) {
         btn.classList.add('selected');
         selectedColor = btn.dataset.color;
         // Swap main image to this color's photo
-        const ci = colorImages.find(r => r.color === selectedColor);
+        const ci = colorImagesData.find(r => r.color === selectedColor);
         if (ci?.image) {
           const allImgs = colorImages.map(r => r.image).filter(Boolean);
           const idx = allImgs.indexOf(ci.image);
