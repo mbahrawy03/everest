@@ -551,11 +551,34 @@ async function handleCheckout() {
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const orderItems = cart.map(i => ({ product_id: i.id, name: i.name, size: i.size, color: i.color, qty: i.qty, price: i.price }));
 
+  // Check stock one more time before placing order
+  for (const item of orderItems) {
+    const { data: inv } = await db.from('inventory')
+      .select('stock')
+      .eq('product_id', item.product_id)
+      .eq('size', item.size)
+      .eq('color', item.color)
+      .single();
+    if (inv && inv.stock < item.qty) {
+      alert(`Sorry, "${item.name} (${item.size}, ${item.color})" just went out of stock.`);
+      return;
+    }
+  }
+
   const { data: orderData, error } = await db.from('orders').insert({
     customer_id: currentUser.id, items: orderItems, total, status: 'awaiting_payment'
   }).select().single();
 
   if (error) { alert('Could not create order. Please try again.'); console.error(error); return; }
+
+  // Decrement inventory for each item
+  for (const item of orderItems) {
+    await db.from('inventory')
+      .update({ stock: db.raw(`stock - ${item.qty}`) })
+      .eq('product_id', item.product_id)
+      .eq('size', item.size)
+      .eq('color', item.color);
+  }
 
   localStorage.setItem('everest_checkout_order', JSON.stringify({
     orderId: orderData.id, total, items: orderItems,
