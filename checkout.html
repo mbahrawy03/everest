@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EveResT — Checkout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{--brand:#1a1a1a;--white:#fafaf8;--accent:#e8e0d4;--highlight:#c9b99a;--muted:#888;--border:#e0dbd3;--error:#c0392b;--success:#2e7d32;--font-display:'Bebas Neue',sans-serif;--font-body:'DM Sans',sans-serif;}
+    body{font-family:var(--font-body);background:#f5f3ef;color:var(--brand);min-height:100vh;}
+    input,select{outline:none;font-family:var(--font-body);}
+    .hidden{display:none!important;}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2.5rem;background:var(--white);border-bottom:1px solid var(--border);}
+    .logo{font-family:var(--font-display);font-size:1.8rem;letter-spacing:0.12em;cursor:pointer;}
+    .logo span{color:var(--highlight);}
+    .back-link{font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:0.4rem;}
+    .back-link:hover{color:var(--brand);}
+    .checkout-wrap{max-width:1000px;margin:2.5rem auto;padding:0 1.5rem;display:grid;grid-template-columns:1fr 380px;gap:2rem;align-items:start;}
+    .section-card{background:var(--white);border:1px solid var(--border);padding:1.75rem;margin-bottom:1.25rem;}
+    .section-title{font-family:var(--font-display);font-size:1.4rem;letter-spacing:0.06em;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+    .form-row.full{grid-template-columns:1fr;}
+    .form-group{display:flex;flex-direction:column;gap:0.35rem;}
+    label{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+    .form-input{border:1px solid var(--border);padding:0.7rem 0.9rem;font-size:0.9rem;transition:border-color 0.2s;width:100%;background:var(--white);}
+    .form-input:focus{border-color:var(--brand);}
+    select.form-input{cursor:pointer;}
+    .payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem;}
+    .pay-method{border:2px solid var(--border);padding:1rem;text-align:center;cursor:pointer;transition:all 0.15s;}
+    .pay-method:hover{border-color:var(--brand);}
+    .pay-method.selected{border-color:var(--brand);background:#faf9f7;}
+    .pay-method i{font-size:1.8rem;display:block;margin-bottom:0.4rem;color:var(--muted);}
+    .pay-method.selected i{color:var(--brand);}
+    .pay-method span{font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;}
+    .info-box{padding:1.25rem;margin-top:0.5rem;}
+    .info-box.card{background:#f9f8f6;border:1px solid var(--border);}
+    .info-box.instapay{background:#f0f9f4;border:1px solid #c3e6cb;}
+    .info-box.vodafone{background:#fff5f5;border:1px solid #f5c6cb;}
+    .info-box.cod{background:#fffbf0;border:1px solid #ffe082;}
+    .pay-number{font-family:var(--font-display);font-size:2rem;letter-spacing:0.1em;margin:0.5rem 0;}
+    .pay-number.instapay{color:var(--success);}
+    .pay-number.vodafone{color:var(--error);}
+    .pay-note{font-size:0.82rem;color:#555;line-height:1.8;}
+    .copy-btn{background:none;border:1px solid var(--success);color:var(--success);padding:0.4rem 0.9rem;font-size:0.75rem;cursor:pointer;font-family:var(--font-body);margin-top:0.5rem;transition:all 0.15s;}
+    .copy-btn:hover{background:var(--success);color:var(--white);}
+    .card-logos{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:0.75rem;}
+    .card-logos img{height:22px;object-fit:contain;}
+    .meeza{font-size:0.72rem;background:#e8e0d4;padding:3px 8px;font-weight:600;}
+    .order-summary{position:sticky;top:1.5rem;}
+    .summary-item{display:flex;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border);align-items:center;}
+    .summary-item:last-of-type{border-bottom:none;}
+    .summary-thumb{width:52px;height:64px;background:var(--accent);object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;overflow:hidden;}
+    .summary-thumb img{width:52px;height:64px;object-fit:cover;}
+    .summary-info{flex:1;}
+    .summary-name{font-size:0.88rem;font-weight:500;margin-bottom:0.2rem;}
+    .summary-meta{font-size:0.75rem;color:var(--muted);}
+    .summary-price{font-size:0.9rem;font-weight:500;white-space:nowrap;}
+    .summary-divider{border:none;border-top:1px solid var(--border);margin:0.75rem 0;}
+    .summary-row{display:flex;justify-content:space-between;font-size:0.88rem;margin-bottom:0.4rem;color:var(--muted);}
+    .summary-total{display:flex;justify-content:space-between;font-size:1.05rem;font-weight:500;margin-top:0.5rem;}
+    .btn-pay{width:100%;background:var(--brand);color:var(--white);border:none;padding:1rem;font-family:var(--font-display);font-size:1.3rem;letter-spacing:0.08em;cursor:pointer;margin-top:1rem;transition:background 0.2s;display:flex;align-items:center;justify-content:center;gap:0.5rem;}
+    .btn-pay:hover{background:#333;}
+    .btn-pay:disabled{background:#aaa;cursor:not-allowed;}
+    .secure-note{display:flex;align-items:center;justify-content:center;gap:0.4rem;font-size:0.72rem;color:var(--muted);margin-top:0.6rem;}
+    .error-msg{color:var(--error);font-size:0.82rem;margin-top:0.5rem;min-height:1rem;}
+    #success-screen{position:fixed;inset:0;background:var(--white);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;text-align:center;padding:2rem;}
+    .success-icon{font-size:5rem;color:var(--success);margin-bottom:1rem;}
+    .success-title{font-family:var(--font-display);font-size:3.5rem;letter-spacing:0.06em;margin-bottom:0.75rem;}
+    .success-sub{color:var(--muted);font-size:0.9rem;line-height:1.8;max-width:400px;margin-bottom:1.5rem;}
+    .success-id{font-family:monospace;background:#f0f9f4;border:1px solid #c3e6cb;color:var(--success);padding:0.6rem 1.2rem;font-size:1rem;margin-bottom:1.5rem;font-weight:600;}
+    .btn-continue{background:var(--brand);color:var(--white);border:none;padding:0.85rem 2rem;font-family:var(--font-body);font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;}
+    @media(max-width:768px){.checkout-wrap{grid-template-columns:1fr;}.order-summary{position:static;}.payment-methods{grid-template-columns:1fr;}nav{padding:1rem 1.2rem;}}
+  </style>
+</head>
+<body>
+
+<!-- SUCCESS -->
+<div id="success-screen" class="hidden">
+  <i class="ti ti-circle-check success-icon"></i>
+  <div class="success-title">ORDER PLACED!</div>
+  <div class="success-sub">Thank you for shopping EveResT 🏔️<br>Your order is confirmed. We'll reach out to confirm shipping soon.</div>
+  <div class="success-id" id="success-order-id"></div>
+  <button class="btn-continue" onclick="window.location.href='index.html'">Continue Shopping</button>
+</div>
+
+<nav>
+  <div class="logo" onclick="window.location.href='index.html'">Eve<span>ResT</span></div>
+  <a class="back-link" href="index.html"><i class="ti ti-arrow-left"></i> Back to shop</a>
+</nav>
+
+<div class="checkout-wrap">
+  <div>
+    <!-- Contact -->
+    <div class="section-card">
+      <div class="section-title">Contact Information</div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name *</label><input class="form-input" id="first-name" placeholder="Mohamed"/></div>
+        <div class="form-group"><label>Last Name *</label><input class="form-input" id="last-name" placeholder="Ahmed"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email *</label><input class="form-input" type="email" id="email" placeholder="you@email.com"/></div>
+        <div class="form-group"><label>Phone *</label><input class="form-input" type="tel" id="phone" placeholder="01xxxxxxxxx"/></div>
+      </div>
+    </div>
+
+    <!-- Shipping -->
+    <div class="section-card">
+      <div class="section-title">Shipping Address</div>
+      <div class="form-row full">
+        <div class="form-group"><label>Full Address *</label><input class="form-input" id="address" placeholder="Street, building, floor, apartment"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>City *</label>
+          <select class="form-input" id="city">
+            <option value="">Select city</option>
+            <option>Cairo</option><option>Alexandria</option><option>Giza</option>
+            <option>Sharm El Sheikh</option><option>Hurghada</option><option>Luxor</option>
+            <option>Aswan</option><option>Mansoura</option><option>Tanta</option>
+            <option>Zagazig</option><option>Ismailia</option><option>Suez</option>
+            <option>Port Said</option><option>Minya</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Postal Code</label><input class="form-input" id="postal" placeholder="11311"/></div>
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="section-card">
+      <div class="section-title">Payment Method</div>
+      <div class="payment-methods">
+        <div class="pay-method selected" data-method="card"><i class="ti ti-credit-card"></i><span>Visa / Card</span></div>
+        <div class="pay-method" data-method="instapay"><i class="ti ti-building-bank"></i><span>InstaPay</span></div>
+        <div class="pay-method" data-method="vodafone"><i class="ti ti-device-mobile"></i><span>Vodafone Cash</span></div>
+        <div class="pay-method" data-method="cod"><i class="ti ti-cash"></i><span>Cash on Delivery</span></div>
+      </div>
+
+      <div id="payment-card">
+        <div class="info-box card">
+          <p style="font-size:0.85rem;line-height:1.7;color:#555;">You'll be redirected to Paymob's secure page to pay. All Egyptian cards accepted.</p>
+          <div class="card-logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" alt="Visa"/>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/200px-Mastercard-logo.svg.png" alt="Mastercard"/>
+            <span class="meeza">MEEZA</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="payment-instapay" class="hidden">
+        <div class="info-box instapay">
+          <p style="font-size:0.82rem;font-weight:500;">Send the total to this InstaPay ID:</p>
+          <div class="pay-number instapay" id="display-instapay">—</div>
+          <p class="pay-note">1. Open your bank app → InstaPay<br>2. Send <strong id="instapay-total"></strong> to the ID above<br>3. Screenshot the transfer confirmation<br>4. Click "Confirm Order" — we'll verify & ship</p>
+          <button class="copy-btn" id="copy-instapay-btn">Copy ID</button>
+        </div>
+      </div>
+
+      <div id="payment-vodafone" class="hidden">
+        <div class="info-box vodafone">
+          <p style="font-size:0.82rem;font-weight:500;">Send the total to this Vodafone Cash number:</p>
+          <div class="pay-number vodafone" id="display-vodafone">—</div>
+          <p class="pay-note">1. Open Vodafone Cash<br>2. Send <strong id="vodafone-total"></strong> to the number above<br>3. Click "Confirm Order" — we'll verify within 1 hour</p>
+        </div>
+      </div>
+
+      <div id="payment-cod" class="hidden">
+        <div class="info-box cod">
+          <p style="font-size:0.88rem;font-weight:500;margin-bottom:0.5rem;">💵 Pay when your order arrives</p>
+          <p class="pay-note">Have the exact amount ready when the courier delivers your order. A <strong>COD fee</strong> may apply depending on your city — it will be shown in your order total above.</p>
+        </div>
+      </div>
+    </div>
+    <p class="error-msg" id="checkout-error"></p>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="order-summary">
+    <div class="section-card">
+      <div class="section-title">Your Order</div>
+      <div id="summary-items"></div>
+      <hr class="summary-divider"/>
+      <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">—</span></div>
+      <div class="summary-row"><span>Shipping</span><span id="sum-shipping">—</span></div>
+      <div class="summary-row hidden" id="cod-fee-row"><span>COD Fee</span><span id="sum-cod-fee">—</span></div>
+      <div class="summary-total"><span>Total</span><span id="sum-total">—</span></div>
+      <button class="btn-pay" id="pay-btn">
+        <i class="ti ti-lock"></i>
+        <span id="pay-btn-label">Pay Now</span>
+      </button>
+      <div class="secure-note"><i class="ti ti-shield-check"></i> Secure checkout</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ══════════════════════════════════════════════════
+//  CONFIGURE YOUR DETAILS BELOW
+// ══════════════════════════════════════════════════
+const PAYMOB_API_KEY        = 'YOUR_PAYMOB_API_KEY';
+const PAYMOB_INTEGRATION_ID = 'YOUR_INTEGRATION_ID';
+const INSTAPAY_ID           = 'YOUR_INSTAPAY_ID';
+const VODAFONE_NUMBER       = 'YOUR_VODAFONE_NUMBER';
+
+// Shipping cost per city (EGP). Add/edit cities as needed.
+// Cities not listed fall back to DEFAULT_SHIPPING.
+const DEFAULT_SHIPPING = 80;
+const SHIPPING_BY_CITY = {
+  'Cairo':          50,
+  'Giza':           50,
+  'Alexandria':     70,
+  'Mansoura':       70,
+  'Tanta':          70,
+  'Zagazig':        70,
+  'Ismailia':       70,
+  'Suez':           80,
+  'Port Said':      80,
+  'Sharm El Sheikh':100,
+  'Hurghada':       100,
+  'Luxor':          120,
+  'Aswan':          120,
+  'Minya':          90,
+  'Other':          DEFAULT_SHIPPING,
+};
+
+// Extra fee charged on Cash on Delivery orders (set to 0 to disable)
+const COD_FEE = 20;
+// ══════════════════════════════════════════════════
+
+document.getElementById('display-instapay').textContent = INSTAPAY_ID;
+document.getElementById('display-vodafone').textContent = VODAFONE_NUMBER;
+
+document.getElementById('copy-instapay-btn').onclick = () => {
+  navigator.clipboard.writeText(INSTAPAY_ID).then(() => {
+    document.getElementById('copy-instapay-btn').textContent = '✓ Copied!';
+    setTimeout(() => document.getElementById('copy-instapay-btn').textContent = 'Copy ID', 2000);
+  });
+};
+
+// Load stored order
+const orderData = JSON.parse(localStorage.getItem('everest_checkout_order') || 'null');
+if (!orderData) { window.location.href = 'index.html'; }
+
+// Prefill from user session
+db.auth.getSession().then(({ data: { session } }) => {
+  if (!session?.user) return;
+  const user = session.user;
+  document.getElementById('email').value = user.email || '';
+  const name = user.user_metadata?.full_name || '';
+  const parts = name.split(' ');
+  document.getElementById('first-name').value = parts[0] || '';
+  document.getElementById('last-name').value  = parts.slice(1).join(' ') || '';
+});
+
+// ── TOTALS ────────────────────────────────────────
+const subtotal = orderData?.total || 0;
+let shippingCost = DEFAULT_SHIPPING;
+let selectedMethod = 'card';
+
+function getTotal() {
+  return subtotal + shippingCost + (selectedMethod === 'cod' ? COD_FEE : 0);
+}
+
+function updateTotals() {
+  const total = getTotal();
+  const isCod = selectedMethod === 'cod';
+  document.getElementById('sum-subtotal').textContent  = `EGP ${subtotal.toLocaleString()}`;
+  document.getElementById('sum-shipping').textContent  = `EGP ${shippingCost.toLocaleString()}`;
+  document.getElementById('sum-total').textContent     = `EGP ${total.toLocaleString()}`;
+  document.getElementById('cod-fee-row').classList.toggle('hidden', !isCod || COD_FEE === 0);
+  if (isCod && COD_FEE > 0) document.getElementById('sum-cod-fee').textContent = `EGP ${COD_FEE}`;
+  document.getElementById('instapay-total').textContent = `EGP ${total.toLocaleString()}`;
+  document.getElementById('vodafone-total').textContent = `EGP ${total.toLocaleString()}`;
+}
+
+// Update shipping when city changes
+document.getElementById('city').addEventListener('change', e => {
+  shippingCost = SHIPPING_BY_CITY[e.target.value] ?? DEFAULT_SHIPPING;
+  updateTotals();
+});
+
+updateTotals();
+
+// Render order summary items
+document.getElementById('summary-items').innerHTML = (orderData?.items || []).map(item => `
+  <div class="summary-item">
+    <div class="summary-thumb">${item.image ? `<img src="${item.image}" alt="${item.name}"/>` : (item.emoji||'👕')}</div>
+    <div class="summary-info">
+      <div class="summary-name">${item.name}</div>
+      <div class="summary-meta">${item.size}${item.color?' · '+item.color:''} · Qty ${item.qty}</div>
+    </div>
+    <div class="summary-price">EGP ${(item.price*item.qty).toLocaleString()}</div>
+  </div>`).join('');
+
+// ── PAYMENT METHOD TOGGLE ─────────────────────────
+document.querySelectorAll('.pay-method').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.pay-method').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedMethod = btn.dataset.method;
+    document.getElementById('payment-card').classList.toggle('hidden',     selectedMethod !== 'card');
+    document.getElementById('payment-instapay').classList.toggle('hidden', selectedMethod !== 'instapay');
+    document.getElementById('payment-vodafone').classList.toggle('hidden', selectedMethod !== 'vodafone');
+    document.getElementById('payment-cod').classList.toggle('hidden',      selectedMethod !== 'cod');
+    document.getElementById('pay-btn-label').textContent =
+      selectedMethod === 'card' ? 'Pay Now' : 'Confirm Order';
+    updateTotals();
+  });
+});
+
+// Validate form
+function validate() {
+  const fn = document.getElementById('first-name').value.trim();
+  const ln = document.getElementById('last-name').value.trim();
+  const em = document.getElementById('email').value.trim();
+  const ph = document.getElementById('phone').value.trim();
+  const ad = document.getElementById('address').value.trim();
+  const ci = document.getElementById('city').value;
+  const er = document.getElementById('checkout-error');
+  er.textContent = '';
+  if (!fn||!ln)             { er.textContent='Please enter your full name.'; return null; }
+  if (!em||!em.includes('@')){ er.textContent='Please enter a valid email.'; return null; }
+  if (!ph||ph.length<10)    { er.textContent='Please enter a valid phone (10+ digits).'; return null; }
+  if (!ad)                  { er.textContent='Please enter your delivery address.'; return null; }
+  if (!ci)                  { er.textContent='Please select your city.'; return null; }
+  return { firstName:fn, lastName:ln, email:em, phone:ph, address:ad, city:ci };
+}
+
+// Pay button
+document.getElementById('pay-btn').onclick = async () => {
+  const info = validate(); if (!info) return;
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  document.getElementById('pay-btn-label').textContent = 'Processing...';
+
+  const total = getTotal();
+
+  // Save shipping info & update total
+  await db.from('orders').update({
+    shipping_info: { ...info, shipping_cost: shippingCost, cod_fee: selectedMethod === 'cod' ? COD_FEE : 0 },
+    total,
+    status: selectedMethod === 'card' ? 'awaiting_payment' : (selectedMethod === 'cod' ? 'pending_cod' : 'pending')
+  }).eq('id', orderData.orderId);
+
+  if (selectedMethod !== 'card') {
+    showSuccess(orderData.orderId); return;
+  }
+
+  // Paymob card flow
+  try {
+    const authRes  = await fetch('https://accept.paymob.com/api/auth/tokens', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ api_key: PAYMOB_API_KEY })
+    });
+    const { token: authToken } = await authRes.json();
+
+    const ordRes = await fetch('https://accept.paymob.com/api/ecommerce/orders', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        auth_token: authToken,
+        delivery_needed: false,
+        amount_cents: total * 100,
+        currency: 'EGP',
+        merchant_order_id: orderData.orderId,
+        items: (orderData.items||[]).map(i => ({
+          name: i.name, amount_cents: i.price*100,
+          description: `${i.size}${i.color?' - '+i.color:''}`, quantity: i.qty
+        }))
+      })
+    });
+    const paymobOrder = await ordRes.json();
+
+    const keyRes = await fetch('https://accept.paymob.com/api/acceptance/payment_keys', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        auth_token: authToken,
+        amount_cents: total * 100,
+        expiration: 3600,
+        order_id: paymobOrder.id,
+        currency: 'EGP',
+        integration_id: Number(PAYMOB_INTEGRATION_ID),
+        billing_data: {
+          first_name: info.firstName, last_name: info.lastName,
+          email: info.email, phone_number: info.phone,
+          apartment:'NA', floor:'NA', street: info.address,
+          building:'NA', shipping_method:'NA', postal_code:'00000',
+          city: info.city, country:'EG', state: info.city
+        }
+      })
+    });
+    const { token: paymentKey } = await keyRes.json();
+
+    // Redirect to Paymob iframe
+    window.location.href = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_INTEGRATION_ID}?payment_token=${paymentKey}`;
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('checkout-error').textContent = 'Payment error. Please try again or use InstaPay.';
+    btn.disabled = false;
+    document.getElementById('pay-btn-label').textContent = 'Pay Now';
+  }
+};
+
+function showSuccess(orderId) {
+  localStorage.removeItem('everest_checkout_order');
+  document.getElementById('success-order-id').textContent = 'Order #' + orderId.toString().substring(0,8).toUpperCase();
+  document.getElementById('success-screen').classList.remove('hidden');
+}
+
+// Handle Paymob redirect back
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === 'true' || params.get('txn_response_code') === 'APPROVED') {
+  const stored = JSON.parse(localStorage.getItem('everest_checkout_order') || 'null');
+  if (stored) {
+    db.from('orders').update({ status: 'confirmed' }).eq('id', stored.orderId);
+    showSuccess(stored.orderId);
+    localStorage.removeItem('everest_checkout_order');
+  }
+}
+</script>
+</body>
+</html>
