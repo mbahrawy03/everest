@@ -540,9 +540,9 @@ document.getElementById('p-images').addEventListener('change', async e => {
   for (const file of files) {
     const ext = file.name.split('.').pop().toLowerCase();
 const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const { error } = await db.storage.from('products').upload(fileName, file, { upsert: true });
+    const { error } = await db.storage.from('Products').upload(fileName, file, { upsert: true });
     if (!error) {
-      const { data: urlData } = db.storage.from('products').getPublicUrl(fileName);
+      const { data: urlData } = db.storage.from('Products').getPublicUrl(fileName);
       uploadedImages.push(urlData.publicUrl);
       uploaded++;
     }
