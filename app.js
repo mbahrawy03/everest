@@ -178,6 +178,41 @@ function renderProducts() {
   });
 }
 
+// ── INVENTORY ─────────────────────────────────────────────────
+let productInventory = []; // loaded when product modal opens
+
+async function loadProductInventory(productId) {
+  const { data } = await db.from('inventory')
+    .select('size, color, stock')
+    .eq('product_id', productId);
+  productInventory = data || [];
+}
+
+function getStock(size, color) {
+  if (!size || !color) return null;
+  const row = productInventory.find(r =>
+    r.size === size && r.color.toLowerCase() === (color||'').toLowerCase()
+  );
+  return row ? row.stock : null;
+}
+
+function updateStockDisplay() {
+  const stockEl = document.getElementById('modal-stock');
+  if (!selectedSize || !selectedColor) { stockEl.textContent = ''; return; }
+  const qty = getStock(selectedSize, selectedColor);
+  if (qty === null) { stockEl.textContent = ''; return; }
+  if (qty === 0) {
+    stockEl.textContent = 'Out of stock';
+    stockEl.className = 'modal-stock low';
+  } else if (qty <= 3) {
+    stockEl.textContent = `Only ${qty} left!`;
+    stockEl.className = 'modal-stock low';
+  } else {
+    stockEl.textContent = `${qty} in stock`;
+    stockEl.className = 'modal-stock';
+  }
+}
+
 function colorNameToHex(name) {
   const map = {
     // Basic Colors
