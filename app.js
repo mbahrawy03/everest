@@ -358,6 +358,7 @@ function openProduct(id) {
         colorGrid.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedColor = btn.dataset.color;
+        updateStockDisplay();
         // Swap main image to this color's photo
         const ci = colorImagesData.find(r => r.color === selectedColor);
         if (ci?.image) {
