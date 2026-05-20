@@ -854,6 +854,14 @@ document.getElementById('save-product-btn').onclick = async () => {
   saveBtn.textContent = 'Save Product'; saveBtn.disabled = false;
 
   if (error) { errEl.textContent = 'Error: ' + error.message; console.error(error); return; }
+  // Save inventory — get the product id (new insert returns it, edit uses existing)
+  let savedId = editingProductId;
+  if (!savedId) {
+    const { data: newP } = await db.from('products')
+      .select('id').order('created_at', { ascending: false }).limit(1).single();
+    savedId = newP?.id;
+  }
+  if (savedId) await saveInventory(savedId);
   toast(editingProductId ? 'Product updated!' : 'Product added to store!');
   resetProductForm();
   await loadProducts(); renderDashboard();
