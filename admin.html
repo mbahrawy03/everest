@@ -528,7 +528,9 @@ function renderColorPhotoRows() {
   container.innerHTML = colorRows.map((row, i) => `
     <div class="color-photo-row">
       <span class="color-photo-swatch" style="background:${colorNameToHex(row.color)}"></span>
-      <span class="color-photo-name">${row.color}</span>
+      <input class="form-input color-name-input" value="${row.color}" data-idx="${i}" 
+        placeholder="Color name..." 
+        style="width:110px;padding:0.4rem 0.6rem;font-size:0.85rem;margin:0"/>
       ${row.image
         ? `<img class="color-photo-img" src="${row.image}" alt="${row.color}"/>`
         : `<div class="color-photo-placeholder">No photo yet</div>`}
