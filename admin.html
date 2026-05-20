@@ -596,11 +596,13 @@ function startEditProduct(id) {
   if (!p) return;
   editingProductId = id;
   if (p.color_images && p.color_images.length > 0) {
+    // Already has color+photo pairs — load them directly
     colorRows = p.color_images.map(ci => ({ color: ci.color, image: ci.image || null }));
   } else {
-    const cols = p.colors || [];
+    // Has images but no colors yet — show each photo with an empty color name
     const imgs = p.images?.length > 0 ? p.images : (p.image_url ? [p.image_url] : []);
-    colorRows = cols.map((c, i) => ({ color: c, image: imgs[i] || null }));
+    const cols = p.colors || [];
+    colorRows = imgs.map((img, i) => ({ color: cols[i] || '', image: img }));
   }
   document.getElementById('add-product-title').textContent = 'Edit Product';
   document.getElementById('p-name').value     = p.name;
