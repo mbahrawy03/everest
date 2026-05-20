@@ -512,8 +512,119 @@ function renderProducts(search='') {
 document.getElementById('products-search').addEventListener('input', e => renderProducts(e.target.value));
 
 function colorNameToHex(name) {
-  const map = {'black':'#1a1a1a','white':'#f5f5f5','grey':'#888','gray':'#888','beige':'#c9b99a','sand':'#d4c4a0','khaki':'#8b7355','olive':'#6b6b3a','navy':'#1a2744','blue':'#2563eb','red':'#dc2626','green':'#16a34a','pink':'#ec4899','purple':'#9333ea','orange':'#ea580c','yellow':'#ca8a04','brown':'#78350f','cream':'#fef9ef','camel':'#c19a6b','rust':'#b45309'};
-  return map[name.toLowerCase()] || '#c9b99a';
+  const map = {
+    // Basic Colors
+    'black':'#1a1a1a',
+    'white':'#f5f5f5',
+    'off white':'#f0ede6',
+    'off-white':'#f0ede6',
+    'ivory':'#fffff0',
+
+    // Greys
+    'grey':'#888',
+    'gray':'#888',
+    'light grey':'#c8c8c8',
+    'light gray':'#c8c8c8',
+    'dark grey':'#444',
+    'charcoal':'#36454f',
+    'light grey boss':'#D0D0D0',
+    'light grey balmain':'#E0E0E0',
+
+    // Beige / Cream / Neutral
+    'beige':'#c9b99a',
+    'sand':'#d4c4a0',
+    'taupe':'#b5a99a',
+    'light beige':'#EDE6D8',
+    'stone':'#EDE6D8',
+    'cream':'#FAF6F0',
+    'off-white cream':'#FAF6F0',
+    'cream boss':'#F5EDE0',
+    'off-white boss':'#F5EDE0',
+    'off-white patterned':'#F5F4EF',
+
+    // Browns
+    'brown':'#78350f',
+    'dark brown':'#3C2F2A',
+    'chocolate':'#7b3f00',
+    'dark brown chocolate':'#3C2F2A',
+    'coffee':'#6f4e37',
+    'tan':'#d2b48c',
+    'camel':'#c19a6b',
+    'mocha':'#967969',
+    'walnut':'#773f1a',
+    'light brown':'#a0785a',
+    'khaki':'#8b7355',
+    'khaki brownish olive':'#8A7D5F',
+    'khaki taupe brown':'#8A7A5E',
+
+    // Greens
+    'olive':'#6b6b3a',
+    'olive green':'#4A5F3E',
+    'army':'#4a5240',
+    'army green':'#4a5240',
+    'military green':'#4a5240',
+    'forest green':'#228b22',
+    'green':'#16a34a',
+    'dark green':'#1F3A2F',
+    'dark green ck':'#1A3C2F',
+    'dark green teal':'#1A3F35',
+    'teal':'#008080',
+    'teal green':'#006D5B',
+    'cyan':'#00bcd4',
+    'turquoise':'#40e0d0',
+    'mint':'#98ff98',
+
+    // Blues
+    'navy':'#1a2744',
+    'navy blue':'#1C2A44',
+    'blue':'#2563eb',
+    'sky blue':'#87ceeb',
+    'baby blue':'#89cff0',
+    'cobalt':'#0047ab',
+    'royal blue':'#4169e1',
+
+    // Reds / Burgundy / Maroon
+    'red':'#B81E2E',
+    'burgundy':'#5C1F2A',
+    'maroon':'#5C1F2A',
+    'wine':'#722f37',
+    'deep purple':'#3F1E2E',
+
+    // Orange / Rust
+    'orange':'#ea580c',
+    'burnt orange':'#cc5500',
+    'rust':'#B85C3C',
+    'orange-brown':'#B85C3C',
+    'brick':'#cb4154',
+    'terracotta':'#e2725b',
+    'peach':'#ffcba4',
+    'apricot':'#fbceb1',
+
+    // Pinks
+    'pink':'#ec4899',
+    'light pink':'#F4C6C8',
+    'blush':'#de9aa0',
+    'rose':'#ff007f',
+    'dusty pink':'#d4a0a0',
+
+    // Purple
+    'purple':'#9333ea',
+    'lavender':'#e6e6fa',
+    'lilac':'#c8a2c8',
+    'plum':'#8e4585',
+
+    // Yellow / Gold
+    'yellow':'#ca8a04',
+    'mustard':'#e1ad01',
+    'golden':'#ffd700',
+    'gold':'#ffd700',
+
+    // Metallic
+    'silver':'#c0c0c0',
+  };
+
+  const key = name.toLowerCase().trim();
+  return map[key] || '#c9b99a';
 }
 
 // colorRows = [{color:'Black', image:'https://...'}, ...]
