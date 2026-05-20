@@ -801,7 +801,7 @@ function renderCustomers(search='') {
   </tr></thead><tbody>${list.map(c => {
     const orders     = allOrders.filter(o => o.customer_id === c.id);
     const totalSpent = orders.reduce((s,o) => s + Number(o.total), 0);
-    const date       = new Date(c.created_at).toLocaleDateString('en-EG',{day:'numeric',month:'short',year:'numeric'});
+    const date       = new Date(c.created_at).toLocaleString('en-EG', {day:'numeric',month:'short',year:'numeric', hour:'2-digit',minute:'2-digit'})
     return `<tr>
       <td style="font-weight:500">${c.full_name||'—'}</td>
       <td>${c.email}</td>
