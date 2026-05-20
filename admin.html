@@ -784,7 +784,7 @@ function resetProductForm() {
   renderColorPhotoRows();
 }
 
-function startEditProduct(id) {
+async function startEditProduct(id) {
   const p = allProducts.find(x => String(x.id) === String(id));
   if (!p) return;
   editingProductId = id;
