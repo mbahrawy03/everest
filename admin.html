@@ -564,6 +564,12 @@ function renderColorPhotoRows() {
       renderColorPhotoRows();
     });
   });
+
+  container.querySelectorAll('.color-name-input').forEach(input => {
+    input.addEventListener('input', () => {
+      colorRows[Number(input.dataset.idx)].color = input.value.trim();
+    });
+  });
 }
 
 document.getElementById('add-color-row-btn').addEventListener('click', () => {
