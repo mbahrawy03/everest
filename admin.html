@@ -807,6 +807,7 @@ function startEditProduct(id) {
   document.getElementById('p-emoji').value    = p.emoji || '';
   document.getElementById('p-desc').value     = p.description || '';
   renderColorPhotoRows();
+  await loadInventory(id);
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.querySelector('[data-page="add-product"]').classList.add('active');
