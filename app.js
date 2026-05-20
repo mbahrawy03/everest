@@ -417,6 +417,7 @@ function openProduct(id) {
     colorSection.classList.add('hidden');
   }
 
+  loadProductInventory(currentProduct.id);
   document.getElementById('product-overlay').classList.remove('hidden');
 }
 
