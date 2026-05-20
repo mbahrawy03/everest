@@ -324,10 +324,8 @@ function openProduct(id) {
   renderModalImages(images);
 
   // Stock
-  const stock = currentProduct.stock || 0;
-  const stockEl = document.getElementById('modal-stock');
-  stockEl.textContent = stock <= 5 && stock > 0 ? `Only ${stock} left!` : stock === 0 ? 'Out of stock' : `${stock} in stock`;
-  stockEl.className = 'modal-stock' + (stock <= 5 ? ' low' : '');
+  // Stock shown dynamically when size+color selected
+  document.getElementById('modal-stock').textContent = '';
 
   // Sizes
   const sizes = currentProduct.sizes || ['S','M','L','XL'];
