@@ -518,6 +518,17 @@ function renderOrders(filter='all', search='') {
   el.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async () => {
       await db.from('orders').update({status:sel.value}).eq('id',sel.dataset.id);
+      // Email customer about status change
+      const order = allOrders.find(x => x.id === sel.dataset.id);
+      if (order?.customers?.email) {
+        await db.functions.invoke('send-order-email', {
+          body: {
+            order: { ...order, status: sel.value },
+            customer: { email: order.customers.email, name: order.customers.full_name || '' },
+            event: 'status_update'
+          }
+        })
+      }
       const o = allOrders.find(x=>x.id===sel.dataset.id);
       if (o) o.status = sel.value;
       renderDashboard(); renderRecentOrders();
