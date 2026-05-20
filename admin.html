@@ -861,8 +861,6 @@ document.getElementById('save-product-btn').onclick = async () => {
       .select('id').order('created_at', { ascending: false }).limit(1).single();
     savedId = newP?.id;
   }
-  form.onsubmit = async (e) => {
-  e.preventDefault();
   if (savedId) await saveInventory(savedId);
   toast(editingProductId ? 'Product updated!' : 'Product added to store!');
   resetProductForm();
