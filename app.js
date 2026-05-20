@@ -585,6 +585,8 @@ async function handleCheckout() {
       event: 'new_order'
     }
   })
+  console.log('Email result:', emailData, emailError);
+  // Decrement inventory for each item
 
   // Decrement inventory for each item
   for (const item of orderItems) {
