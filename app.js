@@ -536,7 +536,7 @@ async function openOrders() {
   const { data } = await db.from('orders').select('*').eq('customer_id', currentUser.id).order('created_at', { ascending: false });
   if (!data || data.length === 0) { ordersList.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;padding:1rem 0;">No orders yet.</p>'; return; }
   ordersList.innerHTML = data.map(order => {
-    const date  = new Date(order.created_at).toLocaleDateString('en-EG', { year:'numeric', month:'short', day:'numeric' });
+    const date  = new Date(order.created_at).toLocaleString('en-EG', {day:'numeric',month:'short',year:'numeric', hour:'2-digit',minute:'2-digit'})
     const items = (order.items || []).map(i => `${i.name} (${i.size}${i.color?', '+i.color:''}) ×${i.qty}`).join(', ');
     return `<div class="order-item">
       <div class="order-meta"><span class="order-id">#${order.id.toString().substring(0,8).toUpperCase()}</span><span class="order-date">${date}</span></div>
