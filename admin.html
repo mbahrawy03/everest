@@ -771,7 +771,9 @@ async function saveInventory(productId) {
 
 // ── ADD / EDIT PRODUCT ────────────────────────────────────────
 function resetProductForm() {
-  editingProductId = null; colorRows = [];
+  editingProductId = null; colorRows = []; inventoryData = {};
+  document.getElementById('inventory-card').classList.remove('visible');
+  document.getElementById('inventory-grid').innerHTML = '';
   document.getElementById('add-product-title').textContent = 'Add Product';
   ['p-name','p-price','p-stock','p-sizes','p-desc','p-emoji'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('p-category').value = '';
