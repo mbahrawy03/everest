@@ -492,7 +492,8 @@ function addToCart(product, size, color) {
   const key = `${product.id}-${size}-${color||''}`;
   const existing = cart.find(i => i.key === key);
   if (existing) existing.qty += 1;
-  else cart.push({ key, id: product.id, name: product.name, price: product.price, emoji: product.emoji || '👕', image: product.images?.[0] || product.image_url || null, size, color: color || null, qty: 1 });
+  else cart.push({ key, id: product.id, name: product.name, price: product.price, emoji: product.emoji || '👕', const colorMatch = color && product.color_images?.find(ci => ci.color === color && ci.image);
+const image = colorMatch?.image || product.images?.[0] || product.image_url || null;, qty: 1 });
   saveCart(); updateCartUI(); openCart();
 }
 
