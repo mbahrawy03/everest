@@ -466,6 +466,8 @@ function setupModals() {
     if (!selectedSize) { alert('Please select a size.'); return; }
     const colors = currentProduct.colors || [];
     if (colors.length > 0 && !selectedColor) { alert('Please select a color.'); return; }
+    const qty = getStock(selectedSize, selectedColor);
+    if (qty !== null && qty === 0) { alert('Sorry, this combination is out of stock.'); return; }
     addToCart(currentProduct, selectedSize, selectedColor);
     document.getElementById('product-overlay').classList.add('hidden');
   };
