@@ -238,7 +238,7 @@ let shippingCities = [];
 let selectedMethod = 'card';
 
 async function initShipping() {
-  const { data } = await db.from('settings').select('value').eq('key', 'shipping_config').single();
+  const { data } = await db.from('settings').select('value').eq('key', 'shipping_config').maybeSingle();
   const config = data?.value || { cod_fee: 0, cities: [] };
   codFee = config.cod_fee ?? 0;
   shippingCities = config.cities || [];
