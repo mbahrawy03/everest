@@ -340,7 +340,23 @@ document.getElementById('pay-btn').onclick = async () => {
     status: selectedMethod === 'card' ? 'awaiting_payment' : (selectedMethod === 'cod' ? 'pending_cod' : 'pending')
   }).eq('id', orderData.orderId);
 
+  // Send confirmation email for non-card payments (card payments email on payment success)
   if (selectedMethod !== 'card') {
+    await db.functions.invoke('send-order-email', {
+      body: {
+        order: {
+          id: orderData.orderId,
+          status: 'pending',
+          total,
+          items: orderData.items || []
+        },
+        customer: {
+          email: orderData.customer?.email || currentUser?.email || '',
+          name: orderData.customer?.name || currentUser?.user_metadata?.full_name || ''
+        },
+        event: 'new_order'
+      }
+    });
     showSuccess(orderData.orderId); return;
   }
 
