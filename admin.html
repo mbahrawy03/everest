@@ -697,6 +697,78 @@ document.getElementById('new-color-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); document.getElementById('add-color-row-btn').click(); }
 });
 
+
+  // ── INVENTORY GRID ────────────────────────────────────────────
+let inventoryData = {}; // key: "size|color" → qty
+
+function renderInventoryGrid() {
+  const sizes = document.getElementById('p-sizes').value
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const colors = colorRows.map(r => r.color).filter(Boolean);
+  const card = document.getElementById('inventory-card');
+  const grid = document.getElementById('inventory-grid');
+
+  if (sizes.length === 0 || colors.length === 0) {
+    card.classList.remove('visible');
+    return;
+  }
+  card.classList.add('visible');
+
+  let html = `<table class="inventory-table"><thead><tr>
+    <th>Size</th>
+    ${colors.map(c => `<th><span class="inv-color-dot" style="background:${colorNameToHex(c)}"></span>${c}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  for (const size of sizes) {
+    html += `<tr><td style="font-weight:500">${size}</td>`;
+    for (const color of colors) {
+      const key = `${size}|${color}`;
+      const qty = inventoryData[key] ?? 0;
+      const cls = qty === 0 ? 'zero' : qty <= 3 ? 'low' : '';
+      html += `<td>
+        <input type="number" class="stock-input ${cls}" 
+          data-key="${key}" value="${qty}" min="0"
+          oninput="inventoryData['${key}']=parseInt(this.value)||0;this.className='stock-input '+(parseInt(this.value)===0?'zero':parseInt(this.value)<=3?'low':'')"/>
+      </td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  grid.innerHTML = html;
+}
+
+async function loadInventory(productId) {
+  const { data } = await db.from('inventory')
+    .select('size, color, stock')
+    .eq('product_id', productId);
+  inventoryData = {};
+  (data || []).forEach(row => {
+    inventoryData[`${row.size}|${row.color}`] = row.stock;
+  });
+  renderInventoryGrid();
+}
+
+async function saveInventory(productId) {
+  const sizes = document.getElementById('p-sizes').value
+    .split(',').map(s => s.trim()).filter(Boolean);
+  const colors = colorRows.map(r => r.color).filter(Boolean);
+
+  const rows = [];
+  for (const size of sizes) {
+    for (const color of colors) {
+      const key = `${size}|${color}`;
+      rows.push({
+        product_id: productId,
+        size,
+        color,
+        stock: inventoryData[key] ?? 0
+      });
+    }
+  }
+  if (rows.length === 0) return;
+  await db.from('inventory').upsert(rows, { onConflict: 'product_id,size,color' });
+}
+
 // ── ADD / EDIT PRODUCT ────────────────────────────────────────
 function resetProductForm() {
   editingProductId = null; colorRows = [];
