@@ -242,7 +242,7 @@ function openProduct(id) {
 
   // Colors — clicking a color swaps the main image
   const colors = currentProduct.colors || [];
-  const colorImages = currentProduct.color_images || [];
+  const colorImagesData = currentProduct.color_images || [];
   const colorSection = document.getElementById('color-section');
   const colorGrid = document.getElementById('color-grid');
   if (colors.length > 0) {
