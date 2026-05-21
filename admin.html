@@ -516,6 +516,16 @@ function renderOrders(filter='all', search='') {
   const el = document.getElementById('orders-table');
   if (!filtered.length) { el.innerHTML=`<div class="empty"><i class="ti ti-shopping-cart"></i><p>No orders found</p></div>`; return; }
   el.innerHTML = buildOrderTable(filtered, true);
+  el.querySelectorAll('[data-delete-order]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this order? This cannot be undone.')) return;
+      const { error } = await db.from('orders').delete().eq('id', btn.dataset.deleteOrder);
+      if (error) { toast('Error deleting order: ' + error.message); return; }
+      allOrders = allOrders.filter(o => o.id !== btn.dataset.deleteOrder);
+      renderOrders(); renderRecentOrders(); renderDashboard();
+      toast('Order deleted');
+    });
+  });
   el.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async () => {
       await db.from('orders').update({status:sel.value}).eq('id',sel.dataset.id);
