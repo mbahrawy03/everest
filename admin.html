@@ -433,6 +433,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     document.getElementById('page-' + item.dataset.page).classList.add('active');
     if (item.dataset.page === 'add-product') resetProductForm();
     if (item.dataset.page === 'orders') document.getElementById('new-orders-badge').classList.add('hidden');
+    if (item.dataset.page === 'trash') renderTrash();
   });
 });
 document.getElementById('refresh-btn').onclick = loadAll;
