@@ -1015,6 +1015,67 @@ document.querySelectorAll('.nav-item').forEach(item => {
   });
 });
 
+function renderTrash() {
+  const deleted = allOrders.filter(o => o.deleted_at);
+  const el = document.getElementById('trash-table');
+  if (!deleted.length) {
+    el.innerHTML = `<div class="empty"><i class="ti ti-trash"></i><p>Trash is empty</p></div>`;
+    return;
+  }
+  el.innerHTML = `<table><thead><tr>
+    <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Deleted</th><th>Actions</th>
+  </tr></thead><tbody>
+  ${deleted.map(o => {
+    const date = new Date(o.deleted_at).toLocaleDateString('en-EG', {day:'numeric',month:'short',year:'numeric'});
+    const items = (o.items||[]).map(i => `${i.name} ×${i.qty}`).join(', ');
+    const name  = o.customers?.full_name || o.customers?.email || 'Guest';
+    return `<tr>
+      <td style="font-family:monospace;font-size:0.78rem">#${o.id.toString().substring(0,8).toUpperCase()}</td>
+      <td>${name}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">${items}</td>
+      <td>EGP ${Number(o.total).toLocaleString()}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">${date}</td>
+      <td style="display:flex;gap:0.4rem">
+        <button class="action-btn" data-restore="${o.id}">Restore</button>
+        <button class="action-btn danger" data-perm-delete="${o.id}">Delete Forever</button>
+      </td>
+    </tr>`;
+  }).join('')}
+  </tbody></table>`;
+
+  el.querySelectorAll('[data-restore]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await db.from('orders').update({ deleted_at: null }).eq('id', btn.dataset.restore);
+      const o = allOrders.find(x => x.id === btn.dataset.restore);
+      if (o) o.deleted_at = null;
+      renderTrash(); renderOrders(); renderRecentOrders(); renderDashboard();
+      toast('Order restored');
+    });
+  });
+
+  el.querySelectorAll('[data-perm-delete]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Permanently delete this order? Cannot be undone.')) return;
+      await db.from('orders').delete().eq('id', btn.dataset.permDelete);
+      allOrders = allOrders.filter(o => o.id !== btn.dataset.permDelete);
+      renderTrash(); renderDashboard();
+      toast('Order permanently deleted');
+    });
+  });
+}
+
+document.getElementById('empty-trash-btn').onclick = async () => {
+  const deleted = allOrders.filter(o => o.deleted_at);
+  if (!deleted.length) { toast('Trash is already empty'); return; }
+  if (!confirm(`Permanently delete all ${deleted.length} trashed orders?`)) return;
+  for (const o of deleted) {
+    await db.from('orders').delete().eq('id', o.id);
+  }
+  allOrders = allOrders.filter(o => !o.deleted_at);
+  renderTrash(); renderDashboard();
+  toast('Trash emptied');
+};
+
 // ── TOAST ─────────────────────────────────────────────────────
 function toast(msg) {
   const el = document.getElementById('toast');
