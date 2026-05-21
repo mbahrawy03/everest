@@ -484,7 +484,18 @@ function renderRecentOrders() {
   const el = document.getElementById('recent-orders-table');
   const recent = allOrders.filter(o => !o.deleted_at).slice(0, 8);
   if (!recent.length) { el.innerHTML=`<div class="empty"><i class="ti ti-shopping-cart"></i><p>No orders yet</p></div>`; return; }
-  el.innerHTML = buildOrderTable(recent, false);
+  el.innerHTML = buildOrderTable(recent, true);
+  el.querySelectorAll('[data-delete-order]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Move this order to trash?')) return;
+      const { error } = await db.from('orders').update({ deleted_at: new Date().toISOString() }).eq('id', btn.dataset.deleteOrder);
+      if (error) { toast('Error: ' + error.message); return; }
+      const o = allOrders.find(x => x.id === btn.dataset.deleteOrder);
+      if (o) o.deleted_at = new Date().toISOString();
+      renderRecentOrders(); renderOrders(); renderDashboard();
+      toast('Order moved to trash');
+    });
+  });
 }
 
 // ── ORDERS ────────────────────────────────────────────────────
