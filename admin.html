@@ -464,7 +464,7 @@ function renderDashboard() {
 }
 function renderRecentOrders() {
   const el = document.getElementById('recent-orders-table');
-  const recent = allOrders.slice(0,8);
+  const recent = allOrders.filter(o => !o.deleted_at).slice(0, 8);
   if (!recent.length) { el.innerHTML=`<div class="empty"><i class="ti ti-shopping-cart"></i><p>No orders yet</p></div>`; return; }
   el.innerHTML = buildOrderTable(recent, false);
 }
