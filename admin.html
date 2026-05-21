@@ -523,12 +523,13 @@ function renderOrders(filter='all', search='') {
   el.innerHTML = buildOrderTable(filtered, true);
   el.querySelectorAll('[data-delete-order]').forEach(btn => {
     btn.addEventListener('click', async () => {
-      if (!confirm('Delete this order? This cannot be undone.')) return;
-      const { error } = await db.from('orders').delete().eq('id', btn.dataset.deleteOrder);
-      if (error) { toast('Error deleting order: ' + error.message); return; }
-      allOrders = allOrders.filter(o => o.id !== btn.dataset.deleteOrder);
+      if (!confirm('Move this order to trash?')) return;
+      const { error } = await db.from('orders').update({ deleted_at: new Date().toISOString() }).eq('id', btn.dataset.deleteOrder);
+      if (error) { toast('Error: ' + error.message); return; }
+      const o = allOrders.find(x => x.id === btn.dataset.deleteOrder);
+      if (o) o.deleted_at = new Date().toISOString();
       renderOrders(); renderRecentOrders(); renderDashboard();
-      toast('Order deleted');
+      toast('Order moved to trash');
     });
   });
   el.querySelectorAll('.status-select').forEach(sel => {
