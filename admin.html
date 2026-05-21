@@ -468,7 +468,7 @@ function renderRecentOrders() {
 // ── ORDERS ────────────────────────────────────────────────────
 function buildOrderTable(orders, withSelect) {
   return `<table><thead><tr>
-    <th>Order ID</th><th>Customer</th><th>Delivery Info</th><th>Items</th><th>Total</th><th>Status</th><th>Date & Time</th>
+    <th>Order ID</th><th>Customer</th><th>Delivery Info</th><th>Items</th><th>Total</th><th>Status</th><th>Date & Time</th><th></th>
   </tr></thead><tbody>${orders.map(o => {
     const date  = new Date(o.created_at).toLocaleString('en-EG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
     const items = (o.items||[]).map(i => {
