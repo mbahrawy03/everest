@@ -568,8 +568,8 @@ function renderOrders(filter='all', search='') {
     sel.addEventListener('change', async () => {
       await db.from('orders').update({status:sel.value}).eq('id',sel.dataset.id);
       // Update in memory so filter stays correct immediately
-      const o = allOrders.find(x => String(x.id) === String(sel.dataset.id));
-      if (o) o.status = sel.value;
+      const ord2 = allOrders.find(x => String(x.id) === String(sel.dataset.id));
+      if (ord2) ord2.status = sel.value;
       renderOrders(
         document.getElementById('orders-filter').value,
         document.getElementById('orders-search').value
