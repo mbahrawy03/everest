@@ -501,7 +501,8 @@ function buildOrderTable(orders, withSelect) {
       <td style="max-width:180px;font-size:0.8rem;color:var(--muted)">${items}</td>
       <td style="font-weight:500">EGP ${Number(o.total).toLocaleString()}</td>
       <td>${statusEl}</td>
-      <td style="font-size:0.8rem;color:var(--muted);white-space:nowrap">${date}</td>
+      <td style="font-size:0.8rem;color:var(--muted)">${date}</td>
+      <td><button class="action-btn danger" data-delete-order="${o.id}">Delete</button></td>
     </tr>`;
   }).join('')}</tbody></table>`;
 }
