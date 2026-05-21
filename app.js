@@ -112,6 +112,18 @@ function showUserMenu() {
 async function loadProducts() {
   const { data, error } = await db.from('products').select('*').eq('active', true).order('created_at', { ascending: false });
   allProducts = (!error && data) ? data : getDemoProducts();
+
+  // Load inventory totals and merge into products
+  const { data: inventory } = await db.from('inventory').select('product_id, stock');
+  if (inventory && inventory.length > 0) {
+    allProducts = allProducts.map(p => {
+      const totalStock = inventory
+        .filter(i => i.product_id === p.id)
+        .reduce((sum, i) => sum + (i.stock || 0), 0);
+      return { ...p, stock: totalStock };
+    });
+  }
+
   renderProducts();
   updateCategoryCounts();
 }
