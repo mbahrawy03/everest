@@ -60,32 +60,87 @@ function setupAuth() {
   });
 
   document.getElementById('login-btn').onclick = async () => {
-    const email = document.getElementById('login-email').value.trim();
-    const pass  = document.getElementById('login-password').value;
-    const err   = document.getElementById('login-error');
-    err.textContent = '';
-    if (!email || !pass) { err.textContent = 'Please fill in all fields.'; return; }
-    const { error } = await db.auth.signInWithPassword({ email, password: pass });
-    if (error) { err.textContent = error.message; return; }
-    closeAuth();
-  };
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Please fill in all fields.'; return; }
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+  if (error) { err.textContent = error.message; return; }
+  closeAuth();
+};
 
-  document.getElementById('signup-btn').onclick = async () => {
-    const name  = document.getElementById('signup-name').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const pass  = document.getElementById('signup-password').value;
-    const err   = document.getElementById('signup-error');
-    err.textContent = '';
-    if (!name || !email || !pass) { err.textContent = 'Please fill in all fields.'; return; }
-    if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
-    const { data, error } = await db.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
-    if (error) { err.textContent = error.message; return; }
-    if (data.user) {
-      await db.from('customers').upsert({ id: data.user.id, email, full_name: name }, { onConflict: 'id' });
-    }
-    closeAuth();
-    alert('Account created! You can now login.');
-  };
+// Toggle password visibility — login
+document.getElementById('login-toggle-pass').addEventListener('click', () => {
+  const inp = document.getElementById('login-password');
+  const btn = document.getElementById('login-toggle-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+});
+
+// Forgot password
+document.getElementById('forgot-link').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const err   = document.getElementById('login-error');
+  if (!email) { err.textContent = 'Enter your email above first.'; return; }
+  const { error } = await db.auth.resetPasswordForEmail(email);
+  if (error) { err.textContent = error.message; return; }
+  err.style.color = '#2e7d32';
+  err.textContent = '✓ Reset link sent — check your email.';
+});
+
+document.getElementById('signup-btn').onclick = async () => {
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-password').value;
+  const err   = document.getElementById('signup-error');
+  err.textContent = '';
+  if (!name || !email || !pass) { err.textContent = 'Please fill in all fields.'; return; }
+  // Strong password: min 8 chars, uppercase, lowercase, number, special char
+  const strongPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!strongPass.test(pass)) {
+    err.textContent = 'Password must be 8+ chars with uppercase, lowercase, number, and special character (!@#$%...).';
+    return;
+  }
+  const { data, error } = await db.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
+  if (error) { err.textContent = error.message; return; }
+  if (data.user) {
+    await db.from('customers').upsert({ id: data.user.id, email, full_name: name }, { onConflict: 'id' });
+  }
+  closeAuth();
+  alert('Account created! You can now login.');
+};
+
+// Toggle password visibility — signup
+document.getElementById('signup-toggle-pass').addEventListener('click', () => {
+  const inp = document.getElementById('signup-password');
+  const btn = document.getElementById('signup-toggle-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+});
+
+// Password strength meter
+document.getElementById('signup-password').addEventListener('input', () => {
+  const pass = document.getElementById('signup-password').value;
+  const bar  = document.getElementById('pass-strength-bar');
+  const fill = document.getElementById('pass-strength-fill');
+  const label = document.getElementById('pass-strength-label');
+  if (!pass) { bar.style.display = 'none'; label.textContent = ''; return; }
+  bar.style.display = 'block';
+  let score = 0;
+  if (pass.length >= 8)           score++;
+  if (/[A-Z]/.test(pass))         score++;
+  if (/[a-z]/.test(pass))         score++;
+  if (/\d/.test(pass))            score++;
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass)) score++;
+  const colors = ['#e53935','#e53935','#fb8c00','#fdd835','#43a047'];
+  const labels = ['Too weak','Weak','Fair','Good','Strong'];
+  fill.style.width  = (score * 20) + '%';
+  fill.style.background = colors[score - 1] || '#eee';
+  label.textContent = labels[score - 1] || '';
+  label.style.color = colors[score - 1] || '#888';
+});
 }
 
 function renderUserBtn() {
