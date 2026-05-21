@@ -543,8 +543,10 @@ function buildOrderTable(orders, withSelect) {
 
 function renderOrders(filter='all', search='') {
   const filtered = allOrders.filter(o => {
-    if (o.deleted_at) return false; // hide deleted
-    const ms = filter==='all' || o.status===filter;
+    if (o.deleted_at) return false;
+    const orderStatus = (o.status || 'pending').toLowerCase().trim();
+    const filterVal   = filter.toLowerCase().trim();
+    const ms = filterVal === 'all' || orderStatus === filterVal;
     const mq = !search || (o.customers?.email||'').toLowerCase().includes(search.toLowerCase()) || (o.customers?.full_name||'').toLowerCase().includes(search.toLowerCase());
     return ms && mq;
   });
