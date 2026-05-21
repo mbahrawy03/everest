@@ -513,9 +513,10 @@ function buildOrderTable(orders, withSelect) {
 
 function renderOrders(filter='all', search='') {
   const filtered = allOrders.filter(o => {
-    const ms = filter==='all'||o.status===filter;
-    const mq = !search||(o.customers?.email||'').toLowerCase().includes(search.toLowerCase())||(o.customers?.full_name||'').toLowerCase().includes(search.toLowerCase());
-    return ms&&mq;
+    if (o.deleted_at) return false; // hide deleted
+    const ms = filter==='all' || o.status===filter;
+    const mq = !search || (o.customers?.email||'').toLowerCase().includes(search.toLowerCase()) || (o.customers?.full_name||'').toLowerCase().includes(search.toLowerCase());
+    return ms && mq;
   });
   const el = document.getElementById('orders-table');
   if (!filtered.length) { el.innerHTML=`<div class="empty"><i class="ti ti-shopping-cart"></i><p>No orders found</p></div>`; return; }
