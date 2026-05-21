@@ -491,8 +491,8 @@ function renderRecentOrders() {
       if (!confirm('Move this order to trash?')) return;
       const { error } = await db.from('orders').update({ deleted_at: new Date().toISOString() }).eq('id', btn.dataset.deleteOrder);
       if (error) { toast('Error: ' + error.message); return; }
-      const o = allOrders.find(x => x.id === btn.dataset.deleteOrder);
-      if (o) o.deleted_at = new Date().toISOString();
+      const ord3 = allOrders.find(x => x.id === btn.dataset.deleteOrder);
+      if (ord3) ord3.deleted_at = new Date().toISOString();
       renderRecentOrders(); renderOrders(); renderDashboard();
       toast('Order moved to trash');
     });
@@ -558,8 +558,8 @@ function renderOrders(filter='all', search='') {
       if (!confirm('Move this order to trash?')) return;
       const { error } = await db.from('orders').update({ deleted_at: new Date().toISOString() }).eq('id', btn.dataset.deleteOrder);
       if (error) { toast('Error: ' + error.message); return; }
-      const o = allOrders.find(x => x.id === btn.dataset.deleteOrder);
-      if (o) o.deleted_at = new Date().toISOString();
+      const ord3 = allOrders.find(x => x.id === btn.dataset.deleteOrder);
+      if (ord3) ord3.deleted_at = new Date().toISOString();
       renderOrders(); renderRecentOrders(); renderDashboard();
       toast('Order moved to trash');
     });
