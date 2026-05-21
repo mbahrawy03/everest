@@ -585,8 +585,8 @@ function renderOrders(filter='all', search='') {
           }
         })
       }
-      const o = allOrders.find(x=>x.id===sel.dataset.id);
-      if (o) o.status = sel.value;
+      const ord1 = allOrders.find(x=>x.id===sel.dataset.id);
+      if (ord1) ord1.status = sel.value;
       renderDashboard(); renderRecentOrders();
       toast('Order updated → '+sel.value);
     });
