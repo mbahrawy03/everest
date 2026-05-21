@@ -475,10 +475,11 @@ async function loadCustomers() {
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard() {
-  document.getElementById('stat-orders').textContent    = allOrders.length;
-  document.getElementById('stat-revenue').textContent   = 'EGP ' + allOrders.reduce((s,o) => s+Number(o.total),0).toLocaleString();
+  const activeOrders = allOrders.filter(o => !o.deleted_at);
+  document.getElementById('stat-orders').textContent    = activeOrders.length;
+  document.getElementById('stat-revenue').textContent   = 'EGP ' + activeOrders.reduce((s,o) => s + Number(o.total), 0).toLocaleString();
   document.getElementById('stat-customers').textContent = allCustomers.length;
-  document.getElementById('stat-products').textContent  = allProducts.filter(p=>p.active).length;
+  document.getElementById('stat-products').textContent  = allProducts.filter(p => p.active).length;
 }
 function renderRecentOrders() {
   const el = document.getElementById('recent-orders-table');
