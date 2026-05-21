@@ -155,11 +155,15 @@
   <div class="login-box">
     <div class="logo">Eve<span>ResT</span></div>
     <div class="sub">Admin Panel</div>
-    <form id="admin-login-form" autocomplete="on" onsubmit="return false">
-      <input type="email" id="admin-email" placeholder="Admin email" autocomplete="email"/>
-      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password"/>
-      <button type="submit" class="btn-primary" id="admin-login-btn">Login to Admin</button>
-    </form>
+    <input type="email" id="admin-email" placeholder="Admin email" autocomplete="email"/>
+    <div style="position:relative;">
+      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" style="width:100%;padding-right:2.5rem;box-sizing:border-box;"/>
+      <button type="button" id="admin-toggle-pass" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:1rem;padding:0;">👁</button>
+    </div>
+    <button class="btn-primary" id="admin-login-btn">Login to Admin</button>
+    <p style="text-align:right;margin-top:0.5rem;">
+      <a href="#" id="admin-forgot-link" style="font-size:0.78rem;color:#888;text-decoration:none;">Forgot password?</a>
+    </p>
     <p class="login-error" id="admin-login-error"></p>
   </div>
 </div>
