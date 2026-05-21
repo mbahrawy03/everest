@@ -152,6 +152,56 @@ document.getElementById('signup-password').addEventListener('input', () => {
 });
 }
 
+// Reset password — confirm new password
+document.getElementById('reset-confirm-btn').addEventListener('click', async () => {
+  const pass = document.getElementById('reset-password').value;
+  const err  = document.getElementById('reset-error');
+  err.textContent = '';
+  const strongPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!strongPass.test(pass)) {
+    err.textContent = 'Password must be 8+ chars with uppercase, lowercase, number, and special character.';
+    return;
+  }
+  const { error } = await db.auth.updateUser({ password: pass });
+  if (error) { err.textContent = error.message; return; }
+  // Done — close modal and restore tabs
+  document.querySelector('.auth-tabs').style.display = '';
+  document.getElementById('panel-reset').classList.add('hidden');
+  document.getElementById('panel-login').classList.remove('hidden');
+  closeAuth();
+  alert('✓ Password updated! You are now logged in.');
+});
+
+// Toggle visibility — reset password field
+document.getElementById('reset-toggle-pass').addEventListener('click', () => {
+  const inp = document.getElementById('reset-password');
+  const btn = document.getElementById('reset-toggle-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+});
+
+// Strength meter for reset field
+document.getElementById('reset-password').addEventListener('input', () => {
+  const pass  = document.getElementById('reset-password').value;
+  const bar   = document.getElementById('reset-strength-bar');
+  const fill  = document.getElementById('reset-strength-fill');
+  const label = document.getElementById('reset-strength-label');
+  if (!pass) { bar.style.display = 'none'; label.textContent = ''; return; }
+  bar.style.display = 'block';
+  let score = 0;
+  if (pass.length >= 8) score++;
+  if (/[A-Z]/.test(pass)) score++;
+  if (/[a-z]/.test(pass)) score++;
+  if (/\d/.test(pass)) score++;
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass)) score++;
+  const colors = ['#e53935','#e53935','#fb8c00','#fdd835','#43a047'];
+  const labels = ['Too weak','Weak','Fair','Good','Strong'];
+  fill.style.width = (score * 20) + '%';
+  fill.style.background = colors[score - 1] || '#eee';
+  label.textContent = labels[score - 1] || '';
+  label.style.color = colors[score - 1] || '#888';
+});
+
 function renderUserBtn() {
   if (currentUser) {
     const name = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
