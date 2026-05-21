@@ -1001,6 +1001,25 @@ function toast(msg) {
   el.textContent = msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'), 3000);
 }
+// Toggle password visibility — admin
+document.getElementById('admin-toggle-pass').addEventListener('click', () => {
+  const inp = document.getElementById('admin-password');
+  const btn = document.getElementById('admin-toggle-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+});
+
+// Forgot password — admin
+document.getElementById('admin-forgot-link').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('admin-email').value.trim();
+  const err = document.getElementById('admin-login-error');
+  if (!email) { err.textContent = 'Enter your email above first.'; return; }
+  const { error } = await db.auth.resetPasswordForEmail(email);
+  if (error) { err.textContent = error.message; return; }
+  err.style.color = '#2e7d32';
+  err.textContent = '✓ Reset link sent — check your email.';
+});
 </script>
 </body>
 </html>
