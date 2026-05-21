@@ -567,6 +567,13 @@ function renderOrders(filter='all', search='') {
   el.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', async () => {
       await db.from('orders').update({status:sel.value}).eq('id',sel.dataset.id);
+      // Update in memory so filter stays correct immediately
+      const o = allOrders.find(x => String(x.id) === String(sel.dataset.id));
+      if (o) o.status = sel.value;
+      renderOrders(
+        document.getElementById('orders-filter').value,
+        document.getElementById('orders-search').value
+      );
       // Email customer about status change
       const order = allOrders.find(x => x.id === sel.dataset.id);
       if (order?.customers?.email) {
