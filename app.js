@@ -217,10 +217,31 @@ function openAuth()  { document.getElementById('auth-overlay').classList.remove(
 function closeAuth() { document.getElementById('auth-overlay').classList.add('hidden'); }
 
 function showUserMenu() {
-  const choice = confirm(`Logged in as ${currentUser.email}\n\nOK → View Orders\nCancel → Logout`);
-  if (choice) openOrders();
-  else db.auth.signOut();
+  const menu = document.getElementById('user-menu');
+  const isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    document.getElementById('user-menu-email').textContent = currentUser.email;
+    setTimeout(() => {
+      document.addEventListener('click', function handler(e) {
+        if (!menu.contains(e.target) && e.target !== userBtn) {
+          menu.style.display = 'none';
+          document.removeEventListener('click', handler);
+        }
+      });
+    }, 0);
+  }
 }
+
+document.getElementById('user-menu-orders').addEventListener('click', () => {
+  document.getElementById('user-menu').style.display = 'none';
+  openOrders();
+});
+
+document.getElementById('user-menu-logout').addEventListener('click', () => {
+  document.getElementById('user-menu').style.display = 'none';
+  db.auth.signOut();
+});
 
 // ── PRODUCTS ─────────────────────────────────────────────────
 async function loadProducts() {
