@@ -39,10 +39,19 @@ const searchBar    = document.getElementById('search-bar');
 
 // ── AUTH ─────────────────────────────────────────────────────
 function setupAuth() {
-  db.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
-    renderUserBtn();
-  });
+  db.auth.onAuthStateChange((event, session) => {
+  currentUser = session?.user || null;
+  renderUserBtn();
+  // When user clicks the reset link, show the set-new-password form
+  if (event === 'PASSWORD_RECOVERY') {
+    document.getElementById('auth-overlay').classList.remove('hidden');
+    document.getElementById('panel-login').classList.add('hidden');
+    document.getElementById('panel-signup').classList.add('hidden');
+    document.getElementById('panel-reset').classList.remove('hidden');
+    // Hide the tabs so user can't navigate away
+    document.querySelector('.auth-tabs').style.display = 'none';
+  }
+});
 
   document.getElementById('auth-close').onclick = closeAuth;
   document.getElementById('auth-overlay').addEventListener('click', e => {
