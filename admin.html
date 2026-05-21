@@ -338,8 +338,23 @@
         <input class="search-input" id="customers-search" placeholder="Search by name or email..."/>
       </div>
       <div id="customers-table"><div class="loading">Loading...</div></div>
+   </div>
+</div>
+
+<div class="page" id="page-trash">
+  <div class="page-title">Trash</div>
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-title">Deleted Orders</span>
+      <button class="refresh-btn" id="empty-trash-btn" style="color:var(--error);border-color:var(--error)">
+        <i class="ti ti-trash-x"></i> Empty Trash
+      </button>
     </div>
+    <div id="trash-table"><div class="loading">Loading...</div></div>
   </div>
+</div>
+
+</main>
 </main>
 
 <div id="toast"></div>
