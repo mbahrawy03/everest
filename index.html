@@ -123,7 +123,23 @@
   </ul>
   <div class="nav-icons">
     <i class="ti ti-search" id="search-icon"></i>
-    <span id="user-btn" class="nav-user-btn"></span>
+    <div style="position:relative;">
+      <span id="user-btn" class="nav-user-btn"></span>
+      <div id="user-menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e0dbd3;min-width:220px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid #f0ede8;">
+          <p style="margin:0;font-size:0.7rem;color:#aaa;text-transform:uppercase;letter-spacing:.1em;">Signed in as</p>
+          <p id="user-menu-email" style="margin:4px 0 0;font-size:0.82rem;font-weight:500;color:#1a1a1a;word-break:break-all;"></p>
+        </div>
+        <div style="padding:0.5rem 0;">
+          <button id="user-menu-orders" style="width:100%;text-align:left;background:none;border:none;padding:0.7rem 1.25rem;font-size:0.85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:0.6rem;color:#1a1a1a;">
+            <i class="ti ti-package"></i> My Orders
+          </button>
+          <button id="user-menu-logout" style="width:100%;text-align:left;background:none;border:none;padding:0.7rem 1.25rem;font-size:0.85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:0.6rem;color:#c0392b;">
+            <i class="ti ti-logout"></i> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="cart-wrap" id="cart-btn">
       <i class="ti ti-shopping-bag"></i>
       <span class="cart-badge hidden" id="cart-badge">0</span>
