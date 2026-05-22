@@ -212,7 +212,12 @@
         <span class="table-title">Recent Orders</span>
         <button class="refresh-btn" id="refresh-btn"><i class="ti ti-refresh"></i> Refresh</button>
       </div>
-      <div id="recent-orders-table"><div class="loading">Loading...</div></div>
+      <div class="bulk-bar" id="recent-bulk-bar">
+  <span class="bulk-count"><span id="recent-bulk-count">0</span> selected</span>
+  <button class="bulk-trash-btn" id="recent-bulk-trash">🗑 Move to Trash</button>
+  <button class="bulk-cancel-btn" id="recent-bulk-cancel">Cancel</button>
+</div>
+<div id="recent-orders-table"><div class="loading">Loading...</div></div>
     </div>
   </div>
 
