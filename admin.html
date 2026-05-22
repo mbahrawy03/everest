@@ -377,10 +377,17 @@ let inventoryData = {};
 // ── AUTH ──────────────────────────────────────────────────────
 async function checkAdminAndLoad(user) {
   if (!user) { showLogin(); return; }
-  const { data: profile, error } = await db.from('customers').select('is_admin').eq('id', user.id).single();
+  const { data: profile, error } = await db.from('customers').select('is_admin, is_super_admin').eq('id', user.id).single();
   if (error || !profile?.is_admin) { await db.auth.signOut(); showLogin('Access denied. You are not an admin.'); return; }
-  adminUser = user; isLoggedIn = true;
+  adminUser = user;
+  isSuperAdmin = profile?.is_super_admin === true;
+  isLoggedIn = true;
   document.getElementById('login-screen').classList.add('hidden');
+  // Show/hide admin management nav item
+  const adminNavItem = document.getElementById('nav-admins');
+  if (adminNavItem) adminNavItem.style.display = isSuperAdmin ? 'flex' : 'none';
+  // Update sidebar role label
+  document.querySelector('.sidebar-logo .role').textContent = isSuperAdmin ? 'Super Admin' : 'Admin';
   await loadAll();
   startAutoRefresh();
 }
