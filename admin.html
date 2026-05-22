@@ -709,17 +709,17 @@ function renderOrders(filter='all', search='') {
         document.getElementById('orders-filter').value,
         document.getElementById('orders-search').value
       );
-      // ── EMAIL NOTIFICATION (commented out — uncomment to re-enable) ──
-      // const order = allOrders.find(x => x.id === sel.dataset.id);
-      // if (order?.customers?.email) {
-      //   await db.functions.invoke('send-order-email', {
-      //     body: {
-      //       order: { ...order, status: sel.value },
-      //       customer: { email: order.customers.email, name: order.customers.full_name || '' },
-      //       event: 'status_update'
-      //     }
-      //   })
-      // }
+      // Email customer about status change
+      const order = allOrders.find(x => x.id === sel.dataset.id);
+      if (order?.customers?.email) {
+        await db.functions.invoke('send-order-email', {
+          body: {
+            order: { ...order, status: sel.value },
+            customer: { email: order.customers.email, name: order.customers.full_name || '' },
+            event: 'status_update'
+          }
+        })
+      }
       const ord1 = allOrders.find(x=>x.id===sel.dataset.id);
       if (ord1) ord1.status = sel.value;
       renderDashboard(); renderRecentOrders();
