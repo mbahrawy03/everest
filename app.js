@@ -1,6 +1,6 @@
 // ============================================================
-//  EveResT — app.js  (v3)
-//  Fixes: order bug, colors, multi-image, Instagram
+//  EveResT — app.js  (final)
+//  Merged: all features + new design base
 // ============================================================
 
 const { createClient } = supabase;
@@ -39,9 +39,18 @@ const searchBar    = document.getElementById('search-bar');
 
 // ── AUTH ─────────────────────────────────────────────────────
 function setupAuth() {
-  db.auth.onAuthStateChange((_event, session) => {
+  db.auth.onAuthStateChange((event, session) => {
     currentUser = session?.user || null;
     renderUserBtn();
+    // When user clicks the reset link, show the set-new-password form
+    if (event === 'PASSWORD_RECOVERY') {
+      document.getElementById('auth-overlay').classList.remove('hidden');
+      document.getElementById('panel-login').classList.add('hidden');
+      document.getElementById('panel-signup').classList.add('hidden');
+      document.getElementById('panel-reset').classList.remove('hidden');
+      // Hide the tabs so user can't navigate away
+      document.querySelector('.auth-tabs').style.display = 'none';
+    }
   });
 
   document.getElementById('auth-close').onclick = closeAuth;
@@ -59,6 +68,7 @@ function setupAuth() {
     });
   });
 
+  // ── Login ──
   document.getElementById('login-btn').onclick = async () => {
     const email = document.getElementById('login-email').value.trim();
     const pass  = document.getElementById('login-password').value;
@@ -70,6 +80,27 @@ function setupAuth() {
     closeAuth();
   };
 
+  // Toggle password visibility — login
+  document.getElementById('login-toggle-pass').addEventListener('click', () => {
+    const inp = document.getElementById('login-password');
+    const btn = document.getElementById('login-toggle-pass');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  });
+
+  // Forgot password
+  document.getElementById('forgot-link').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const err   = document.getElementById('login-error');
+    if (!email) { err.textContent = 'Enter your email above first.'; return; }
+    const { error } = await db.auth.resetPasswordForEmail(email);
+    if (error) { err.textContent = error.message; return; }
+    err.style.color = '#2e7d32';
+    err.textContent = '✓ Reset link sent — check your email.';
+  });
+
+  // ── Signup ──
   document.getElementById('signup-btn').onclick = async () => {
     const name  = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
@@ -77,7 +108,12 @@ function setupAuth() {
     const err   = document.getElementById('signup-error');
     err.textContent = '';
     if (!name || !email || !pass) { err.textContent = 'Please fill in all fields.'; return; }
-    if (pass.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+    // Strong password: min 8 chars, uppercase, lowercase, number, special char
+    const strongPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    if (!strongPass.test(pass)) {
+      err.textContent = 'Password must be 8+ chars with uppercase, lowercase, number, and special character (!@#$%...).';
+      return;
+    }
     const { data, error } = await db.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
     if (error) { err.textContent = error.message; return; }
     if (data.user) {
@@ -86,7 +122,86 @@ function setupAuth() {
     closeAuth();
     alert('Account created! You can now login.');
   };
+
+  // Toggle password visibility — signup
+  document.getElementById('signup-toggle-pass').addEventListener('click', () => {
+    const inp = document.getElementById('signup-password');
+    const btn = document.getElementById('signup-toggle-pass');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  });
+
+  // Password strength meter — signup
+  document.getElementById('signup-password').addEventListener('input', () => {
+    const pass  = document.getElementById('signup-password').value;
+    const bar   = document.getElementById('pass-strength-bar');
+    const fill  = document.getElementById('pass-strength-fill');
+    const label = document.getElementById('pass-strength-label');
+    if (!pass) { bar.style.display = 'none'; label.textContent = ''; return; }
+    bar.style.display = 'block';
+    let score = 0;
+    if (pass.length >= 8)                                                          score++;
+    if (/[A-Z]/.test(pass))                                                        score++;
+    if (/[a-z]/.test(pass))                                                        score++;
+    if (/\d/.test(pass))                                                           score++;
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass))                      score++;
+    const colors = ['#e53935','#e53935','#fb8c00','#fdd835','#43a047'];
+    const labels = ['Too weak','Weak','Fair','Good','Strong'];
+    fill.style.width      = (score * 20) + '%';
+    fill.style.background = colors[score - 1] || '#eee';
+    label.textContent     = labels[score - 1] || '';
+    label.style.color     = colors[score - 1] || '#888';
+  });
 }
+
+// ── Reset password — confirm new password ──
+document.getElementById('reset-confirm-btn').addEventListener('click', async () => {
+  const pass = document.getElementById('reset-password').value;
+  const err  = document.getElementById('reset-error');
+  err.textContent = '';
+  const strongPass = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!strongPass.test(pass)) {
+    err.textContent = 'Password must be 8+ chars with uppercase, lowercase, number, and special character.';
+    return;
+  }
+  const { error } = await db.auth.updateUser({ password: pass });
+  if (error) { err.textContent = error.message; return; }
+  document.querySelector('.auth-tabs').style.display = '';
+  document.getElementById('panel-reset').classList.add('hidden');
+  document.getElementById('panel-login').classList.remove('hidden');
+  closeAuth();
+  alert('✓ Password updated! You are now logged in.');
+});
+
+// Toggle visibility — reset password field
+document.getElementById('reset-toggle-pass').addEventListener('click', () => {
+  const inp = document.getElementById('reset-password');
+  const btn = document.getElementById('reset-toggle-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+});
+
+// Password strength meter — reset
+document.getElementById('reset-password').addEventListener('input', () => {
+  const pass  = document.getElementById('reset-password').value;
+  const bar   = document.getElementById('reset-strength-bar');
+  const fill  = document.getElementById('reset-strength-fill');
+  const label = document.getElementById('reset-strength-label');
+  if (!pass) { bar.style.display = 'none'; label.textContent = ''; return; }
+  bar.style.display = 'block';
+  let score = 0;
+  if (pass.length >= 8)                                                        score++;
+  if (/[A-Z]/.test(pass))                                                      score++;
+  if (/[a-z]/.test(pass))                                                      score++;
+  if (/\d/.test(pass))                                                         score++;
+  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pass))                    score++;
+  const colors = ['#e53935','#e53935','#fb8c00','#fdd835','#43a047'];
+  const labels = ['Too weak','Weak','Fair','Good','Strong'];
+  fill.style.width      = (score * 20) + '%';
+  fill.style.background = colors[score - 1] || '#eee';
+  label.textContent     = labels[score - 1] || '';
+  label.style.color     = colors[score - 1] || '#888';
+});
 
 function renderUserBtn() {
   if (currentUser) {
@@ -103,10 +218,31 @@ function openAuth()  { document.getElementById('auth-overlay').classList.remove(
 function closeAuth() { document.getElementById('auth-overlay').classList.add('hidden'); }
 
 function showUserMenu() {
-  const choice = confirm(`Logged in as ${currentUser.email}\n\nOK → View Orders\nCancel → Logout`);
-  if (choice) openOrders();
-  else db.auth.signOut();
+  const menu = document.getElementById('user-menu');
+  const isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    document.getElementById('user-menu-email').textContent = currentUser.email;
+    setTimeout(() => {
+      document.addEventListener('click', function handler(e) {
+        if (!menu.contains(e.target) && e.target !== userBtn) {
+          menu.style.display = 'none';
+          document.removeEventListener('click', handler);
+        }
+      });
+    }, 0);
+  }
 }
+
+document.getElementById('user-menu-orders').addEventListener('click', () => {
+  document.getElementById('user-menu').style.display = 'none';
+  openOrders();
+});
+
+document.getElementById('user-menu-logout').addEventListener('click', () => {
+  document.getElementById('user-menu').style.display = 'none';
+  db.auth.signOut();
+});
 
 // ── PRODUCTS ─────────────────────────────────────────────────
 async function loadProducts() {
@@ -118,10 +254,15 @@ async function loadProducts() {
 
 function getDemoProducts() {
   return [
-    { id:1, name:'Peak Logo Heavy Tee',    category:'tops', price:980,  stock:30, sizes:['M','L','XL','2XL','3XL'], colors:['Black','White'], images:[], emoji:'👕', tag:'new', description:'280gsm heavyweight cotton. Oversized fit, chest logo print.' },
-    { id:2, name:'Summit Oversized Tee',   category:'tops', price:850,  stock:20, sizes:['M','L','XL','2XL','3XL'], colors:['Black','Olive'], images:[], emoji:'👕', tag:'',    description:'Premium heavyweight cotton. Dropped shoulders.' },
-    { id:3, name:'Night Summit Tee',       category:'tops', price:1100, stock:15, sizes:['M','L','XL','2XL','3XL'], colors:['Black'],         images:[], emoji:'👕', tag:'hot', description:'Limited edition graphic tee. 300gsm cotton.' },
-    { id:4, name:'ES Classic Tee',         category:'tops', price:750,  stock:25, sizes:['M','L','XL','2XL','3XL'], colors:['White','Black'], images:[], emoji:'👕', tag:'',    description:'The essential EVEREST tee. Clean, minimal, premium.' },
+    { id:1,  name:'Summit Oversized Hoodie', category:'outerwear',  price:2400, stock:15, sizes:['S','M','L','XL'],         colors:['Black','White','Grey'],  images:[], emoji:'🧥', tag:'new', description:'Premium heavyweight cotton blend. Dropped shoulders, kangaroo pocket.' },
+    { id:2,  name:'Altitude Utility Jacket', category:'outerwear',  price:4200, stock:8,  sizes:['S','M','L','XL'],         colors:['Khaki','Black'],         images:[], emoji:'🫱', tag:'hot', description:'Multi-pocket technical jacket. Water-resistant shell.' },
+    { id:3,  name:'Peak Logo Heavy Tee',     category:'tops',       price:980,  stock:30, sizes:['M','L','XL','2XL','3XL'], colors:['Black','White','Sand'],  images:[], emoji:'👕', tag:'',    description:'280gsm heavyweight cotton. Oversized fit, chest logo print.' },
+    { id:4,  name:'Summit Oversized Tee',    category:'tops',       price:850,  stock:20, sizes:['M','L','XL','2XL','3XL'], colors:['Black','Olive'],         images:[], emoji:'👕', tag:'',    description:'Premium heavyweight cotton. Dropped shoulders.' },
+    { id:5,  name:'Night Summit Tee',        category:'tops',       price:1100, stock:15, sizes:['M','L','XL','2XL','3XL'], colors:['Black'],                 images:[], emoji:'👕', tag:'hot', description:'Limited edition graphic tee. 300gsm cotton.' },
+    { id:6,  name:'ES Classic Tee',          category:'tops',       price:750,  stock:25, sizes:['M','L','XL','2XL','3XL'], colors:['White','Black'],         images:[], emoji:'👕', tag:'',    description:'The essential EVEREST tee. Clean, minimal, premium.' },
+    { id:7,  name:'Basecamp Cargo Pants',    category:'bottoms',    price:2100, stock:12, sizes:['S','M','L','XL'],         colors:['Olive','Black'],         images:[], emoji:'👖', tag:'new', description:'Six-pocket cargo silhouette. Relaxed fit.' },
+    { id:8,  name:'EveResT Six-Panel Cap',   category:'accessories',price:650,  stock:40, sizes:['One Size'],               colors:['Black','Beige'],         images:[], emoji:'🧢', tag:'new', description:'Structured six-panel cap. Embroidered logo.' },
+    { id:9,  name:'Urban Trail Backpack',    category:'accessories',price:3100, stock:7,  sizes:['One Size'],               colors:['Black'],                 images:[], emoji:'🎒', tag:'',    description:'25L capacity. Laptop sleeve, padded straps.' },
   ];
 }
 
@@ -177,7 +318,7 @@ function renderProducts() {
 }
 
 // ── INVENTORY ─────────────────────────────────────────────────
-let productInventory = []; // loaded when product modal opens
+let productInventory = [];
 
 async function loadProductInventory(productId) {
   const { data } = await db.from('inventory')
@@ -189,7 +330,7 @@ async function loadProductInventory(productId) {
 function getStock(size, color) {
   if (!size || !color) return null;
   const row = productInventory.find(r =>
-    r.size === size && r.color.toLowerCase() === (color||'').toLowerCase()
+    r.size === size && r.color.toLowerCase() === (color || '').toLowerCase()
   );
   return row ? row.stock : null;
 }
@@ -322,13 +463,12 @@ function colorNameToHex(name) {
     // Metallic
     'silver':'#c0c0c0',
   };
-
   const key = name.toLowerCase().trim();
   return map[key] || '#c9b99a';
 }
 
 function updateCategoryCounts() {
-  ['tops'].forEach(cat => {
+  ['tops','outerwear','bottoms','accessories'].forEach(cat => {
     const el = document.getElementById(`cnt-${cat}`);
     if (el) el.textContent = allProducts.filter(p => p.category === cat).length + ' items';
   });
@@ -356,8 +496,6 @@ function openProduct(id) {
     : (currentProduct.images?.length > 0 ? currentProduct.images : (currentProduct.image_url ? [currentProduct.image_url] : []));
   renderModalImages(images);
 
-  // Stock
-  // Stock shown dynamically when size+color selected
   document.getElementById('modal-stock').textContent = '';
 
   // Sizes
@@ -455,7 +593,7 @@ function changeImage(images, idx) {
 }
 
 function setupModals() {
-  document.getElementById('product-close').onclick  = () => document.getElementById('product-overlay').classList.add('hidden');
+  document.getElementById('product-close').onclick = () => document.getElementById('product-overlay').classList.add('hidden');
   document.getElementById('product-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('product-overlay')) document.getElementById('product-overlay').classList.add('hidden');
   });
@@ -470,7 +608,7 @@ function setupModals() {
     document.getElementById('product-overlay').classList.add('hidden');
   };
 
-  document.getElementById('orders-close').onclick  = () => document.getElementById('orders-overlay').classList.add('hidden');
+  document.getElementById('orders-close').onclick = () => document.getElementById('orders-overlay').classList.add('hidden');
   document.getElementById('orders-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('orders-overlay')) document.getElementById('orders-overlay').classList.add('hidden');
   });
@@ -491,7 +629,6 @@ function addToCart(product, size, color) {
   const existing = cart.find(i => i.key === key);
   if (existing) existing.qty += 1;
   else {
-    // Pick the image that matches the selected color; fall back to first image
     const colorMatch = color && product.color_images?.find(ci => ci.color === color && ci.image);
     const image = colorMatch?.image || product.images?.[0] || product.image_url || null;
     cart.push({ key, id: product.id, name: product.name, price: product.price, emoji: product.emoji || '👕', image, size, color: color || null, qty: 1 });
@@ -546,7 +683,6 @@ async function handleCheckout() {
   if (cart.length === 0) return;
   if (!currentUser) { closeCart(); openAuth(); return; }
 
-  // Check stock before going to checkout
   const orderItems = cart.map(i => ({ product_id: i.id, name: i.name, size: i.size, color: i.color, qty: i.qty, price: i.price, image: i.image || null, emoji: i.emoji || '👕' }));
   for (const item of orderItems) {
     const { data: inv } = await db.from('inventory')
@@ -563,7 +699,6 @@ async function handleCheckout() {
 
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
 
-  // Only save to localStorage — order will be created in checkout.html after delivery info is submitted
   localStorage.setItem('everest_checkout_order', JSON.stringify({
     total,
     items: orderItems,
@@ -584,15 +719,18 @@ async function openOrders() {
   const ordersList = document.getElementById('orders-list');
   ordersList.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;">Loading...</p>';
   const { data } = await db.from('orders').select('*').eq('customer_id', currentUser.id).order('created_at', { ascending: false });
-  if (!data || data.length === 0) { ordersList.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;padding:1rem 0;">No orders yet.</p>'; return; }
+  if (!data || data.length === 0) {
+    ordersList.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;padding:1rem 0;">No orders yet.</p>';
+    return;
+  }
   ordersList.innerHTML = data.map(order => {
-    const date  = new Date(order.created_at).toLocaleString('en-EG', {day:'numeric',month:'short',year:'numeric', hour:'2-digit',minute:'2-digit'})
-    const items = (order.items || []).map(i => `${i.name} (${i.size}${i.color?', '+i.color:''}) ×${i.qty}`).join(', ');
+    const date  = new Date(order.created_at).toLocaleString('en-EG', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const items = (order.items || []).map(i => `${i.name} (${i.size}${i.color ? ', '+i.color : ''}) ×${i.qty}`).join(', ');
     return `<div class="order-item">
       <div class="order-meta"><span class="order-id">#${order.id.toString().substring(0,8).toUpperCase()}</span><span class="order-date">${date}</span></div>
       <div class="order-products">${items}</div>
       <div class="order-total">EGP ${Number(order.total).toLocaleString()}</div>
-      <span class="order-status">${order.status||'pending'}</span>
+      <span class="order-status">${order.status || 'pending'}</span>
     </div>`;
   }).join('');
 }
