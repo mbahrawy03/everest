@@ -235,7 +235,12 @@
           <button class="refresh-btn" id="refresh-orders-btn"><i class="ti ti-refresh"></i> Refresh</button>
         </div>
       </div>
-      <div id="orders-table"><div class="loading">Loading...</div></div>
+      <div class="bulk-bar" id="orders-bulk-bar">
+  <span class="bulk-count"><span id="orders-bulk-count">0</span> selected</span>
+  <button class="bulk-trash-btn" id="orders-bulk-trash">🗑 Move to Trash</button>
+  <button class="bulk-cancel-btn" id="orders-bulk-cancel">Cancel</button>
+</div>
+<div id="orders-table"><div class="loading">Loading...</div></div>
     </div>
   </div>
 
