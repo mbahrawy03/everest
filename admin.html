@@ -367,11 +367,12 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let adminUser = null;
+let isSuperAdmin = false;
 let allOrders = [], allProducts = [], allCustomers = [];
 let editingProductId = null;
 let isLoggedIn = false;
-let colorRows = [];      // [{color, image}]
-let inventoryData = {};  // "size|color" → qty
+let colorRows = [];
+let inventoryData = {};
 
 // ── AUTH ──────────────────────────────────────────────────────
 async function checkAdminAndLoad(user) {
