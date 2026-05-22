@@ -1045,10 +1045,12 @@ document.getElementById('grant-admin-btn')?.addEventListener('click', async () =
   if (!email) { msg.textContent = 'Enter an email.'; msg.style.color = 'var(--error)'; return; }
 
   // First find the customer (case-insensitive search)
+ // Search case-insensitive, trim whitespace
+  const cleanEmail = email.toLowerCase().trim();
   const { data: found } = await db.from('customers')
-    .select('id')
-    .ilike('email', email)
-    .single();
+    .select('id, email')
+    .ilike('email', cleanEmail)
+    .maybeSingle();
 
   if (!found) {
     msg.textContent = 'No account found with that email. They must sign up on the store first.';
