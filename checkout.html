@@ -405,14 +405,14 @@ document.getElementById('pay-btn').onclick = async () => {
     customer: { email: info.email, name: `${info.firstName} ${info.lastName}`.trim() }
   }));
 
-  // Send confirmation email
-  await db.functions.invoke('send-order-email', {
-    body: {
-      order: { id: newOrder.id, status: 'pending', total, items: orderItems },
-      customer: { email: info.email, name: `${info.firstName} ${info.lastName}`.trim() },
-      event: 'new_order'
-    }
-  });
+  // ── EMAIL NOTIFICATION (commented out — uncomment to re-enable) ──
+  // await db.functions.invoke('send-order-email', {
+  //   body: {
+  //     order: { id: newOrder.id, status: 'pending', total, items: orderItems },
+  //     customer: { email: info.email, name: `${info.firstName} ${info.lastName}`.trim() },
+  //     event: 'new_order'
+  //   }
+  // });
 
   if (selectedMethod !== 'card') {
     showSuccess(newOrder.id);
