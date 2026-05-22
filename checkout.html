@@ -405,14 +405,14 @@ document.getElementById('pay-btn').onclick = async () => {
     customer: { email: info.email, name: `${info.firstName} ${info.lastName}`.trim() }
   }));
 
-  // ── EMAIL NOTIFICATION (commented out — uncomment to re-enable) ──
-  // await db.functions.invoke('send-order-email', {
-  //   body: {
-  //     order: { id: newOrder.id, status: 'pending', total, items: orderItems },
-  //     customer: { email: info.email, name: `${info.firstName} ${info.lastName}`.trim() },
-  //     event: 'new_order'
-  //   }
-  // });
+  // Send confirmation email
+  await db.functions.invoke('send-order-email', {
+    body: {
+      order: { id: newOrder.id, status: 'pending', total, items: orderItems },
+      customer: { email: info.email, name: `${info.firstName} ${info.lastName}`.trim() },
+      event: 'new_order'
+    }
+  });
 
   if (selectedMethod !== 'card') {
     showSuccess(newOrder.id);
@@ -479,8 +479,6 @@ if (params.get('success') === 'true' || params.get('txn_response_code') === 'APP
   const stored = JSON.parse(localStorage.getItem('everest_checkout_order') || 'null');
   if (stored) {
     db.from('orders').update({ status: 'confirmed' }).eq('id', stored.orderId);
-    // ── EMAIL NOTIFICATION (commented out — uncomment to re-enable) ──
-    // sendOrderEmail(stored.orderId, 'confirmed');
     showSuccess(stored.orderId);
     localStorage.removeItem('everest_checkout_order');
   }
