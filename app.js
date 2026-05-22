@@ -464,12 +464,7 @@ function colorNameToHex(name) {
   return map[key] || '#c9b99a';
 }
 
-function updateCategoryCounts() {
-  ['tops','outerwear','bottoms','accessories'].forEach(cat => {
-    const el = document.getElementById(`cnt-${cat}`);
-    if (el) el.textContent = allProducts.filter(p => p.category === cat).length + ' items';
-  });
-}
+function updateCategoryCounts() {}
 
 // ── PRODUCT MODAL ────────────────────────────────────────────
 let currentImageIndex = 0;
