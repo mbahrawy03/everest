@@ -369,7 +369,13 @@
         <i class="ti ti-trash-x"></i> Empty Trash
       </button>
     </div>
-    <div id="trash-table"><div class="loading">Loading...</div></div>
+    <div class="bulk-bar" id="trash-bulk-bar">
+  <span class="bulk-count"><span id="trash-bulk-count">0</span> selected</span>
+  <button class="bulk-trash-btn" id="trash-bulk-restore" style="background:#2e7d32;">↩ Restore Selected</button>
+  <button class="bulk-trash-btn" id="trash-bulk-perm">✕ Delete Forever</button>
+  <button class="bulk-cancel-btn" id="trash-bulk-cancel">Cancel</button>
+</div>
+<div id="trash-table"><div class="loading">Loading...</div></div>
   </div>
 </div>
 
