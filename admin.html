@@ -356,6 +356,37 @@
   </div>
 </div>
 
+<!-- ADMINS PAGE — Super Admin only -->
+<div class="page" id="page-admins">
+  <div class="page-title">Admin Management</div>
+  <div style="background:#fff8e1;border:1px solid #ffe082;padding:1rem 1.25rem;margin-bottom:1.5rem;font-size:0.85rem;color:#e65100;">
+    <strong>Super Admin only.</strong> Changes here affect who can access the admin panel.
+  </div>
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-title">All Admins</span>
+      <button class="refresh-btn" id="refresh-admins-btn"><i class="ti ti-refresh"></i> Refresh</button>
+    </div>
+    <div id="admins-table"><div class="loading">Loading...</div></div>
+  </div>
+  <div class="form-card" style="margin-top:1.5rem;">
+    <div class="form-card-title">Grant Admin Access</div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">The person must already have an account on the store.</p>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+      <input class="search-input" id="grant-admin-email" placeholder="Customer email..." style="width:260px;"/>
+      <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;text-transform:none;letter-spacing:0;color:var(--brand);">
+        <input type="checkbox" id="grant-super-admin"/> Make Super Admin
+      </label>
+      <button class="btn-save" id="grant-admin-btn">Grant Access</button>
+    </div>
+    <p id="grant-admin-msg" style="font-size:0.82rem;margin-top:0.75rem;min-height:1.2rem;"></p>
+  </div>
+</div>
+
+</main>
+
+<div id="toast"></div>
+  
 </main>
 </main>
 
