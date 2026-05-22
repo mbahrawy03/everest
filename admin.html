@@ -556,6 +556,14 @@ function renderRecentOrders() {
       toast('Order moved to trash');
     });
   });
+
+  wireBulkBar(
+    el,
+    document.getElementById('recent-bulk-bar'),
+    document.getElementById('recent-bulk-count'),
+    document.getElementById('recent-bulk-trash'),
+    document.getElementById('recent-bulk-cancel')
+  );
 }
 
 // ── ORDERS ────────────────────────────────────────────────────
