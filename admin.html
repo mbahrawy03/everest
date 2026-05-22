@@ -719,6 +719,14 @@ function renderOrders(filter='all', search='') {
       setTimeout(() => btn.textContent = '📋', 2000);
     });
   });
+
+  wireBulkBar(
+    el,
+    document.getElementById('orders-bulk-bar'),
+    document.getElementById('orders-bulk-count'),
+    document.getElementById('orders-bulk-trash'),
+    document.getElementById('orders-bulk-cancel')
+  );
 }
 document.getElementById('orders-search').addEventListener('input', e => renderOrders(document.getElementById('orders-filter').value, e.target.value));
 document.getElementById('orders-filter').addEventListener('change', e => renderOrders(e.target.value, document.getElementById('orders-search').value));
