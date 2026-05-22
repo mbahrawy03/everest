@@ -1053,7 +1053,8 @@ document.getElementById('grant-admin-btn')?.addEventListener('click', async () =
     .maybeSingle();
 
   if (!found) {
-    msg.textContent = 'No account found with that email. They must sign up on the store first.';
+    // Try auth.users as fallback — maybe they exist in auth but not customers table
+    msg.textContent = `No account found for "${cleanEmail}". Check the email is exactly correct.`;
     msg.style.color = 'var(--error)'; return;
   }
 
