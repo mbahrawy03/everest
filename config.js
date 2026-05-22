@@ -9,38 +9,33 @@ const FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
 
 // Helper: send an order status email to the customer
 async function sendOrderEmail(orderId, status) {
-  try {
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const { data: order } = await db
-      .from('orders')
-      .select('*, customers(full_name, email)')
-      .eq('id', orderId)
-      .single();
-
-    if (!order) return;
-
-    const customer = {
-      email: order.customers?.email || order.shipping_info?.email,
-      name:  order.customers?.full_name ||
-             `${order.shipping_info?.firstName || ''} ${order.shipping_info?.lastName || ''}`.trim() ||
-             'there',
-    };
-
-    if (!customer.email) return;
-
-    order.status = status;
-
-    await fetch(`${FUNCTIONS_URL}/send-order-email`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify({ order, customer }),
-    });
-  } catch(e) {
-    console.warn('Email notification failed:', e);
-  }
+  // ── EMAIL NOTIFICATION (commented out — uncomment to re-enable) ──
+  // try {
+  //   const { createClient } = supabase;
+  //   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  //   const { data: order } = await db
+  //     .from('orders')
+  //     .select('*, customers(full_name, email)')
+  //     .eq('id', orderId)
+  //     .single();
+  //   if (!order) return;
+  //   const customer = {
+  //     email: order.customers?.email || order.shipping_info?.email,
+  //     name:  order.customers?.full_name ||
+  //            `${order.shipping_info?.firstName || ''} ${order.shipping_info?.lastName || ''}`.trim() ||
+  //            'there',
+  //   };
+  //   if (!customer.email) return;
+  //   order.status = status;
+  //   await fetch(`${FUNCTIONS_URL}/send-order-email`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+  //     },
+  //     body: JSON.stringify({ order, customer }),
+  //   });
+  // } catch(e) {
+  //   console.warn('Email notification failed:', e);
+  // }
 }
