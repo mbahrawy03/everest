@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EVEREST — Premium Streetwear</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="style.css?v=8"/>
+</head>
+<body>
+
+<!-- AUTH MODAL -->
+<div id="auth-overlay" class="overlay hidden">
+  <div class="modal">
+    <button class="modal-close" id="auth-close">&times;</button>
+    <div class="auth-tabs">
+      <button class="tab-btn active" data-tab="login">Login</button>
+      <button class="tab-btn" data-tab="signup">Sign Up</button>
+    </div>
+    <div id="panel-login" class="tab-panel">
+      <h2>Welcome Back</h2>
+      <form autocomplete="on" onsubmit="return false">
+        <input type="email" id="login-email" placeholder="Email" autocomplete="email"/>
+        <input type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
+        <button class="btn-primary full" id="login-btn">Login</button>
+      </form>
+      <p class="form-error" id="login-error"></p>
+    </div>
+    <div id="panel-signup" class="tab-panel hidden">
+      <h2>Join EVEREST</h2>
+      <form autocomplete="on" onsubmit="return false">
+        <input type="text" id="signup-name" placeholder="Full Name" autocomplete="name"/>
+        <input type="email" id="signup-email" placeholder="Email" autocomplete="email"/>
+        <input type="password" id="signup-password" placeholder="Password (min 6 chars)" autocomplete="new-password"/>
+        <button class="btn-primary full" id="signup-btn">Create Account</button>
+      </form>
+      <p class="form-error" id="signup-error"></p>
+    </div>
+  </div>
+</div>
+
+<!-- CART SIDEBAR -->
+<div id="cart-overlay" class="overlay hidden">
+  <div class="cart-sidebar">
+    <div class="cart-header">
+      <span class="cart-title">YOUR BAG</span>
+      <button id="cart-close" class="close-x">&times;</button>
+    </div>
+    <div id="cart-items" class="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span id="cart-total">EGP 0</span>
+      </div>
+      <button class="btn-primary full" id="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div id="product-overlay" class="overlay hidden">
+  <div class="product-modal">
+    <button class="modal-close" id="product-close">&times;</button>
+    <div class="product-modal-img" id="modal-img"></div>
+    <div class="product-modal-info">
+      <div class="modal-cat" id="modal-cat"></div>
+      <h2 class="modal-name" id="modal-name"></h2>
+      <div class="modal-price" id="modal-price"></div>
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="size-section">
+        <div class="size-label">Select Size</div>
+        <div class="size-grid" id="size-grid"></div>
+      </div>
+      <div class="size-section hidden" id="color-section">
+        <div class="size-label">Select Color</div>
+        <div class="color-grid" id="color-grid"></div>
+      </div>
+      <div class="modal-stock" id="modal-stock"></div>
+      <button class="btn-primary full" id="modal-add-btn">Add to Bag</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER HISTORY MODAL -->
+<div id="orders-overlay" class="overlay hidden">
+  <div class="modal orders-modal">
+    <button class="modal-close" id="orders-close">&times;</button>
+    <h2>Your Orders</h2>
+    <div id="orders-list"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="logo">
+    <img src="logo.png" alt="EVEREST" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+    <span class="logo-text" style="display:none">EVEREST</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#shop" class="filter-link" data-filter="all">New Drops</a></li>
+    <li><a href="#shop" class="filter-link" data-filter="tops">T-Shirts</a></li>
+  </ul>
+  <div class="nav-icons">
+    <i class="ti ti-search" id="search-icon"></i>
+    <span id="user-btn" class="nav-user-btn"></span>
+    <div class="cart-wrap" id="cart-btn">
+      <i class="ti ti-shopping-bag"></i>
+      <span class="cart-badge hidden" id="cart-badge">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- SEARCH BAR -->
+<div class="search-bar hidden" id="search-bar">
+  <input type="text" id="search-input" placeholder="Search products..."/>
+  <button id="search-close-btn"><i class="ti ti-x"></i></button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">EVEREST</div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Spring / Summer 2026
+      </div>
+      <h1 class="hero-title">WEAR<br>THE<br><span class="gradient-text">PEAK</span></h1>
+      <p class="hero-sub">Premium heavyweight tees engineered for those who move above the ordinary.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">
+          Shop Now <i class="ti ti-arrow-right"></i>
+        </button>
+        <a href="https://www.instagram.com/everest_es" target="_blank" class="hero-ig">
+          <i class="ti ti-brand-instagram"></i> @everest_es
+        </a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hero-card-inner">
+          <div class="hero-badge-pill">NEW DROP</div>
+          <div class="hero-card-visual">
+            <div class="hero-tee-shape"></div>
+          </div>
+          <div class="hero-card-label">SS26 Collection</div>
+        </div>
+      </div>
+      <div class="hero-stat-strip">
+        <div class="hero-stat"><span class="stat-num">100%</span><span class="stat-label">Cotton</span></div>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat"><span class="stat-num">Premium</span><span class="stat-label">Quality</span></div>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat"><span class="stat-num">Egypt</span><span class="stat-label">Made</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>PREMIUM TEES</span><span class="marquee-dot">✦</span>
+    <span>OVERSIZED FIT</span><span class="marquee-dot">✦</span>
+    <span>HEAVYWEIGHT COTTON</span><span class="marquee-dot">✦</span>
+    <span>EVEREST ES</span><span class="marquee-dot">✦</span>
+    <span>CAIRO STREETWEAR</span><span class="marquee-dot">✦</span>
+    <span>SS26 COLLECTION</span><span class="marquee-dot">✦</span>
+    <span>PREMIUM TEES</span><span class="marquee-dot">✦</span>
+    <span>OVERSIZED FIT</span><span class="marquee-dot">✦</span>
+    <span>HEAVYWEIGHT COTTON</span><span class="marquee-dot">✦</span>
+    <span>EVEREST ES</span><span class="marquee-dot">✦</span>
+    <span>CAIRO STREETWEAR</span><span class="marquee-dot">✦</span>
+    <span>SS26 COLLECTION</span><span class="marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- SHOP -->
+<section id="shop">
+  <div class="section-header">
+    <div class="section-title">SHOP ALL</div>
+    <span class="product-count" id="product-count"></span>
+  </div>
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="tops">T-Shirts</button>
+  </div>
+  <div class="product-grid" id="product-grid">
+    <div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</section>
+
+<!-- BANNER -->
+<div class="banner">
+  <div class="banner-content">
+    <div class="banner-eyebrow"><span class="eyebrow-dot white"></span> Limited Release</div>
+    <div class="banner-title">THE DROP:<br><span class="gradient-text">NIGHT SUMMIT</span></div>
+    <p class="banner-sub">The most anticipated drop of the season. Be the first to know.</p>
+  </div>
+  <button class="btn-outline" id="notify-btn">
+    Get Notified <i class="ti ti-bell"></i>
+  </button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo">EVEREST</div>
+      <p class="footer-tagline">Built for the city. Worn above it.</p>
+      <div class="footer-socials">
+        <i class="ti ti-brand-tiktok"></i>
+        <a href="https://www.instagram.com/everest_es?igsh=MXBwcTN0ZmhwbG03Ng==" target="_blank" rel="noopener" style="color:inherit">
+          <i class="ti ti-brand-instagram"></i>
+        </a>
+      </div>
+    </div>
+    <div class="footer-links-col">
+      <div class="footer-col-title">Shop</div>
+      <a href="#shop" class="filter-link" data-filter="all">All Products</a>
+      <a href="#shop" class="filter-link" data-filter="tops">T-Shirts</a>
+    </div>
+    <div class="footer-links-col">
+      <div class="footer-col-title">Info</div>
+      <a href="#">About</a>
+      <a href="#">Shipping</a>
+      <a href="#">Returns</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 EVEREST ES. All rights reserved.</span>
+    <span>Cairo, Egypt</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js?v=8"></script>
+</body>
+</html>
