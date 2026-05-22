@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EVEREST — Premium Streetwear</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="style.css?v=9"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     AUTH MODAL
+     Features: tabs (login/signup/reset), password
+     toggles, strength meter, forgot password link
+════════════════════════════════════════════════ -->
+<div id="auth-overlay" class="overlay hidden">
+  <div class="modal">
+    <button class="modal-close" id="auth-close">&times;</button>
+    <div class="auth-tabs">
+      <button class="tab-btn active" data-tab="login">Login</button>
+      <button class="tab-btn" data-tab="signup">Sign Up</button>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div id="panel-login" class="tab-panel">
+      <h2>Welcome Back</h2>
+      <form autocomplete="on" onsubmit="return false">
+        <input type="email" id="login-email" placeholder="Email" autocomplete="email"/>
+        <div style="position:relative;">
+          <input type="password" id="login-password" placeholder="Password" autocomplete="current-password"
+            style="width:100%;padding-right:2.5rem;box-sizing:border-box;"/>
+          <button type="button" id="login-toggle-pass"
+            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:1rem;padding:0;">👁</button>
+        </div>
+        <p style="text-align:right;margin-top:0.25rem;">
+          <a href="#" id="forgot-link" style="font-size:0.78rem;color:#888;text-decoration:none;">Forgot password?</a>
+        </p>
+        <button class="btn-primary full" id="login-btn">Login</button>
+      </form>
+      <p class="form-error" id="login-error"></p>
+    </div>
+
+    <!-- SIGNUP PANEL -->
+    <div id="panel-signup" class="tab-panel hidden">
+      <h2>Join EVEREST</h2>
+      <form autocomplete="on" onsubmit="return false">
+        <input type="text" id="signup-name" placeholder="Full Name" autocomplete="name"/>
+        <input type="email" id="signup-email" placeholder="Email" autocomplete="email"/>
+        <div style="position:relative;">
+          <input type="password" id="signup-password" placeholder="Password (min 6 chars)" autocomplete="new-password"
+            style="width:100%;padding-right:2.5rem;box-sizing:border-box;"/>
+          <button type="button" id="signup-toggle-pass"
+            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:1rem;padding:0;">👁</button>
+        </div>
+        <div id="pass-strength-bar" style="height:3px;border-radius:2px;margin-top:6px;background:#eee;display:none;">
+          <div id="pass-strength-fill" style="height:100%;border-radius:2px;width:0;transition:width 0.3s,background 0.3s;"></div>
+        </div>
+        <p id="pass-strength-label" style="font-size:0.72rem;color:#888;margin:3px 0 0;min-height:1rem;"></p>
+        <button class="btn-primary full" id="signup-btn">Create Account</button>
+      </form>
+      <p class="form-error" id="signup-error"></p>
+    </div>
+
+    <!-- RESET PASSWORD PANEL -->
+    <div id="panel-reset" class="tab-panel hidden">
+      <h2>Set New Password</h2>
+      <div style="position:relative;">
+        <input type="password" id="reset-password" placeholder="New password"
+          style="width:100%;padding-right:2.5rem;box-sizing:border-box;"/>
+        <button type="button" id="reset-toggle-pass"
+          style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;font-size:1rem;padding:0;">👁</button>
+      </div>
+      <div id="reset-strength-bar" style="height:3px;border-radius:2px;margin-top:6px;background:#eee;display:none;">
+        <div id="reset-strength-fill" style="height:100%;border-radius:2px;width:0;transition:width 0.3s,background 0.3s;"></div>
+      </div>
+      <p id="reset-strength-label" style="font-size:0.72rem;color:#888;margin:3px 0 8px;min-height:1rem;"></p>
+      <button class="btn-primary full" id="reset-confirm-btn">Update Password</button>
+      <p class="form-error" id="reset-error"></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CART SIDEBAR
+════════════════════════════════════════════════ -->
+<div id="cart-overlay" class="overlay hidden">
+  <div class="cart-sidebar">
+    <div class="cart-header">
+      <span class="cart-title">YOUR BAG</span>
+      <button id="cart-close" class="close-x">&times;</button>
+    </div>
+    <div id="cart-items" class="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span id="cart-total">EGP 0</span>
+      </div>
+      <button class="btn-primary full" id="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PRODUCT DETAIL MODAL
+════════════════════════════════════════════════ -->
+<div id="product-overlay" class="overlay hidden">
+  <div class="product-modal">
+    <button class="modal-close" id="product-close">&times;</button>
+    <div class="product-modal-img" id="modal-img"></div>
+    <div class="product-modal-info">
+      <div class="modal-cat" id="modal-cat"></div>
+      <h2 class="modal-name" id="modal-name"></h2>
+      <div class="modal-price" id="modal-price"></div>
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="size-section">
+        <div class="size-label">Select Size</div>
+        <div class="size-grid" id="size-grid"></div>
+      </div>
+      <div class="size-section hidden" id="color-section">
+        <div class="size-label">Select Color</div>
+        <div class="color-grid" id="color-grid"></div>
+      </div>
+      <div class="modal-stock" id="modal-stock"></div>
+      <button class="btn-primary full" id="modal-add-btn">Add to Bag</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     ORDER HISTORY MODAL
+════════════════════════════════════════════════ -->
+<div id="orders-overlay" class="overlay hidden">
+  <div class="modal orders-modal">
+    <button class="modal-close" id="orders-close">&times;</button>
+    <h2>Your Orders</h2>
+    <div id="orders-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     NAV — logo image with fallback + user dropdown
+════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="logo">
+    <img src="logo.png" alt="EVEREST" class="logo-img"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='block'"/>
+    <span class="logo-text" style="display:none">EVEREST</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#shop" class="filter-link" data-filter="all">New Drops</a></li>
+    <li><a href="#shop" class="filter-link" data-filter="tops">T-Shirts</a></li>
+    <li><a href="#shop" class="filter-link" data-filter="outerwear">Outerwear</a></li>
+    <li><a href="#shop" class="filter-link" data-filter="accessories">Accessories</a></li>
+  </ul>
+  <div class="nav-icons">
+    <i class="ti ti-search" id="search-icon"></i>
+
+    <!-- User button + dropdown menu -->
+    <div style="position:relative;">
+      <span id="user-btn" class="nav-user-btn"></span>
+      <div id="user-menu"
+        style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e0dbd3;min-width:220px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+        <div style="padding:1rem 1.25rem;border-bottom:1px solid #f0ede8;">
+          <p style="margin:0;font-size:0.7rem;color:#aaa;text-transform:uppercase;letter-spacing:.1em;">Signed in as</p>
+          <p id="user-menu-email" style="margin:4px 0 0;font-size:0.82rem;font-weight:500;color:#1a1a1a;word-break:break-all;"></p>
+        </div>
+        <div style="padding:0.5rem 0;">
+          <button id="user-menu-orders"
+            style="width:100%;text-align:left;background:none;border:none;padding:0.7rem 1.25rem;font-size:0.85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:0.6rem;color:#1a1a1a;">
+            <i class="ti ti-package"></i> My Orders
+          </button>
+          <button id="user-menu-logout"
+            style="width:100%;text-align:left;background:none;border:none;padding:0.7rem 1.25rem;font-size:0.85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:0.6rem;color:#c0392b;">
+            <i class="ti ti-logout"></i> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-wrap" id="cart-btn">
+      <i class="ti ti-shopping-bag"></i>
+      <span class="cart-badge hidden" id="cart-badge">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- SEARCH BAR -->
+<div class="search-bar hidden" id="search-bar">
+  <input type="text" id="search-input" placeholder="Search products..."/>
+  <button id="search-close-btn"><i class="ti ti-x"></i></button>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     HERO — new design
+════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg-text">EVEREST</div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Spring / Summer 2026
+      </div>
+      <h1 class="hero-title">WEAR<br>THE<br><span class="gradient-text">PEAK</span></h1>
+      <p class="hero-sub">Premium heavyweight tees engineered for those who move above the ordinary.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">
+          Shop Now <i class="ti ti-arrow-right"></i>
+        </button>
+        <a href="https://www.instagram.com/everest_es" target="_blank" class="hero-ig">
+          <i class="ti ti-brand-instagram"></i> @everest_es
+        </a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hero-card-inner">
+          <div class="hero-badge-pill">NEW DROP</div>
+          <div class="hero-card-visual">
+            <div class="hero-tee-shape"></div>
+          </div>
+          <div class="hero-card-label">SS26 Collection</div>
+        </div>
+      </div>
+      <div class="hero-stat-strip">
+        <div class="hero-stat"><span class="stat-num">100%</span><span class="stat-label">Cotton</span></div>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat"><span class="stat-num">Premium</span><span class="stat-label">Quality</span></div>
+        <div class="hero-stat-div"></div>
+        <div class="hero-stat"><span class="stat-num">Egypt</span><span class="stat-label">Made</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     MARQUEE
+════════════════════════════════════════════════ -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>PREMIUM TEES</span><span class="marquee-dot">✦</span>
+    <span>OVERSIZED FIT</span><span class="marquee-dot">✦</span>
+    <span>HEAVYWEIGHT COTTON</span><span class="marquee-dot">✦</span>
+    <span>EVEREST ES</span><span class="marquee-dot">✦</span>
+    <span>CAIRO STREETWEAR</span><span class="marquee-dot">✦</span>
+    <span>SS26 COLLECTION</span><span class="marquee-dot">✦</span>
+    <span>PREMIUM TEES</span><span class="marquee-dot">✦</span>
+    <span>OVERSIZED FIT</span><span class="marquee-dot">✦</span>
+    <span>HEAVYWEIGHT COTTON</span><span class="marquee-dot">✦</span>
+    <span>EVEREST ES</span><span class="marquee-dot">✦</span>
+    <span>CAIRO STREETWEAR</span><span class="marquee-dot">✦</span>
+    <span>SS26 COLLECTION</span><span class="marquee-dot">✦</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SHOP — full filter categories from file 1
+════════════════════════════════════════════════ -->
+<section id="shop">
+  <div class="section-header">
+    <div class="section-title">SHOP ALL</div>
+    <span class="product-count" id="product-count"></span>
+  </div>
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="tops">T-Shirts</button>
+    <button class="filter-btn" data-filter="outerwear">Outerwear</button>
+    <button class="filter-btn" data-filter="bottoms">Bottoms</button>
+    <button class="filter-btn" data-filter="accessories">Accessories</button>
+  </div>
+  <div class="product-grid" id="product-grid">
+    <div class="skeleton"></div><div class="skeleton"></div>
+    <div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     BANNER — new design with gradient text
+════════════════════════════════════════════════ -->
+<div class="banner">
+  <div class="banner-content">
+    <div class="banner-eyebrow"><span class="eyebrow-dot white"></span> Limited Release</div>
+    <div class="banner-title">THE DROP:<br><span class="gradient-text">NIGHT SUMMIT</span></div>
+    <p class="banner-sub">The most anticipated drop of the season. Be the first to know.</p>
+  </div>
+  <button class="btn-outline" id="notify-btn">
+    Get Notified <i class="ti ti-bell"></i>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CATEGORIES — from file 1
+════════════════════════════════════════════════ -->
+<div class="section-header">
+  <div class="section-title">SHOP BY CATEGORY</div>
+</div>
+<div class="categories">
+  <div class="cat-card" data-filter="tops">
+    <div class="cat-name">TOPS</div>
+    <div class="cat-count" id="cnt-tops">—</div>
+  </div>
+  <div class="cat-card" data-filter="outerwear">
+    <div class="cat-name">OUTERWEAR</div>
+    <div class="cat-count" id="cnt-outerwear">—</div>
+  </div>
+  <div class="cat-card" data-filter="bottoms">
+    <div class="cat-name">BOTTOMS</div>
+    <div class="cat-count" id="cnt-bottoms">—</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER — new multi-column design
+════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo">EVEREST</div>
+      <p class="footer-tagline">Built for the city. Worn above it.</p>
+      <div class="footer-socials">
+        <i class="ti ti-brand-tiktok"></i>
+        <a href="https://www.instagram.com/everest_es?igsh=MXBwcTN0ZmhwbG03Ng==" target="_blank" rel="noopener" style="color:inherit">
+          <i class="ti ti-brand-instagram"></i>
+        </a>
+      </div>
+    </div>
+    <div class="footer-links-col">
+      <div class="footer-col-title">Shop</div>
+      <a href="#shop" class="filter-link" data-filter="all">All Products</a>
+      <a href="#shop" class="filter-link" data-filter="tops">T-Shirts</a>
+      <a href="#shop" class="filter-link" data-filter="outerwear">Outerwear</a>
+      <a href="#shop" class="filter-link" data-filter="bottoms">Bottoms</a>
+      <a href="#shop" class="filter-link" data-filter="accessories">Accessories</a>
+    </div>
+    <div class="footer-links-col">
+      <div class="footer-col-title">Info</div>
+      <a href="#">About</a>
+      <a href="#">Shipping</a>
+      <a href="#">Returns</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 EVEREST ES. All rights reserved.</span>
+    <span>Cairo, Egypt</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js?v=9"></script>
+</body>
+</html>
