@@ -547,9 +547,16 @@ function renderOrders(filter='all', search='') {
   const filtered = allOrders.filter(o => {
     if (o.deleted_at) return false;
     const orderStatus = (o.status || 'pending').toLowerCase().trim();
-    const filterVal   = filter.toLowerCase().trim();
+    const filterVal   = (filter || 'all').toLowerCase().trim();
     const ms = filterVal === 'all' || orderStatus === filterVal;
-    const mq = !search || (o.customers?.email||'').toLowerCase().includes(search.toLowerCase()) || (o.customers?.full_name||'').toLowerCase().includes(search.toLowerCase());
+    const sq = search.toLowerCase();
+    const mq = !sq ||
+      (o.customers?.email    || '').toLowerCase().includes(sq) ||
+      (o.customers?.full_name|| '').toLowerCase().includes(sq) ||
+      (o.shipping_info?.firstName || '').toLowerCase().includes(sq) ||
+      (o.shipping_info?.lastName  || '').toLowerCase().includes(sq) ||
+      (o.shipping_info?.phone     || '').includes(sq) ||
+      o.id.toString().toLowerCase().includes(sq);
     return ms && mq;
   });
   const el = document.getElementById('orders-table');
