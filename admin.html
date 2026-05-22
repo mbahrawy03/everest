@@ -1044,9 +1044,20 @@ document.getElementById('grant-admin-btn')?.addEventListener('click', async () =
   msg.textContent = ''; msg.style.color = '';
   if (!email) { msg.textContent = 'Enter an email.'; msg.style.color = 'var(--error)'; return; }
 
+  // First find the customer (case-insensitive search)
+  const { data: found } = await db.from('customers')
+    .select('id')
+    .ilike('email', email)
+    .single();
+
+  if (!found) {
+    msg.textContent = 'No account found with that email. They must sign up on the store first.';
+    msg.style.color = 'var(--error)'; return;
+  }
+
   const { data, error } = await db.from('customers')
     .update({ is_admin: true, is_super_admin: isSuper })
-    .eq('email', email)
+    .eq('id', found.id)
     .select();
 
   if (error) { msg.textContent = 'Error: ' + error.message; msg.style.color = 'var(--error)'; return; }
