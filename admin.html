@@ -994,6 +994,73 @@ function renderCustomers(search='') {
 }
 document.getElementById('customers-search').addEventListener('input', e=>renderCustomers(e.target.value));
 
+// ── ADMINS PAGE (Super Admin only) ────────────────────────────
+async function loadAdmins() {
+  const { data } = await db.from('customers')
+    .select('id, full_name, email, is_admin, is_super_admin, created_at')
+    .eq('is_admin', true)
+    .order('created_at', { ascending: true });
+  renderAdminsTable(data || []);
+}
+
+function renderAdminsTable(admins) {
+  const el = document.getElementById('admins-table');
+  if (!admins.length) { el.innerHTML = `<div class="empty"><i class="ti ti-shield"></i><p>No admins yet</p></div>`; return; }
+  el.innerHTML = `<table><thead><tr>
+    <th>Name</th><th>Email</th><th>Role</th><th>Since</th><th>Actions</th>
+  </tr></thead><tbody>${admins.map(a => {
+    const isMe   = a.id === adminUser?.id;
+    const role   = a.is_super_admin ? '⭐ Super Admin' : 'Admin';
+    const date   = new Date(a.created_at).toLocaleDateString('en-EG', {day:'numeric',month:'short',year:'numeric'});
+    const actions = isMe
+      ? `<span style="font-size:0.75rem;color:var(--muted);">That's you</span>`
+      : `<button class="action-btn danger" data-revoke="${a.id}" data-name="${a.full_name||a.email}">Revoke Access</button>`;
+    return `<tr>
+      <td style="font-weight:500">${a.full_name||'—'}</td>
+      <td>${a.email}</td>
+      <td><span style="font-size:0.82rem;${a.is_super_admin?'color:#e65100;font-weight:600;':''}">${role}</span></td>
+      <td style="font-size:0.8rem;color:var(--muted)">${date}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+
+  el.querySelectorAll('[data-revoke]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm(`Revoke admin access for ${btn.dataset.name}?`)) return;
+      await db.from('customers').update({ is_admin: false, is_super_admin: false }).eq('id', btn.dataset.revoke);
+      toast('Admin access revoked');
+      loadAdmins();
+    });
+  });
+}
+
+document.getElementById('refresh-admins-btn')?.addEventListener('click', loadAdmins);
+
+document.getElementById('grant-admin-btn')?.addEventListener('click', async () => {
+  const email   = document.getElementById('grant-admin-email').value.trim();
+  const isSuper = document.getElementById('grant-super-admin').checked;
+  const msg     = document.getElementById('grant-admin-msg');
+  msg.textContent = ''; msg.style.color = '';
+  if (!email) { msg.textContent = 'Enter an email.'; msg.style.color = 'var(--error)'; return; }
+
+  const { data, error } = await db.from('customers')
+    .update({ is_admin: true, is_super_admin: isSuper })
+    .eq('email', email)
+    .select();
+
+  if (error) { msg.textContent = 'Error: ' + error.message; msg.style.color = 'var(--error)'; return; }
+  if (!data || data.length === 0) {
+    msg.textContent = 'No account found with that email. They must sign up on the store first.';
+    msg.style.color = 'var(--error)'; return;
+  }
+  msg.textContent = `✓ Admin access granted to ${email}${isSuper ? ' (Super Admin)' : ''}.`;
+  msg.style.color = 'var(--success)';
+  document.getElementById('grant-admin-email').value = '';
+  document.getElementById('grant-super-admin').checked = false;
+  loadAdmins();
+  toast('Admin access granted!');
+});
+
 // ── SHIPPING SETTINGS ─────────────────────────────────────────
 let shippingConfig = { cod_fee: 20, cities: [] };
 
