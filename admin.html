@@ -1271,16 +1271,19 @@ function renderTrash() {
   const el = document.getElementById('trash-table');
   if (!deleted.length) {
     el.innerHTML = `<div class="empty"><i class="ti ti-trash"></i><p>Trash is empty</p></div>`;
+    document.getElementById('trash-bulk-bar').classList.remove('visible');
     return;
   }
   el.innerHTML = `<table><thead><tr>
+    <th><input type="checkbox" class="row-check" id="check-all-trash"/></th>
     <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Deleted</th><th>Actions</th>
   </tr></thead><tbody>
   ${deleted.map(o => {
-    const date = new Date(o.deleted_at).toLocaleDateString('en-EG', {day:'numeric',month:'short',year:'numeric'});
+    const date  = new Date(o.deleted_at).toLocaleDateString('en-EG',{day:'numeric',month:'short',year:'numeric'});
     const items = (o.items||[]).map(i => `${i.name} ×${i.qty}`).join(', ');
     const name  = o.customers?.full_name || o.customers?.email || 'Guest';
     return `<tr>
+      <td><input type="checkbox" class="row-check order-check" data-id="${o.id}"/></td>
       <td style="font-family:monospace;font-size:0.78rem">#${o.id.toString().substring(0,8).toUpperCase()}</td>
       <td>${name}</td>
       <td style="font-size:0.8rem;color:var(--muted)">${items}</td>
@@ -1294,44 +1297,84 @@ function renderTrash() {
   }).join('')}
   </tbody></table>`;
 
- el.querySelectorAll('[data-restore]').forEach(btn => {
+  // Select all
+  const checkAll = el.querySelector('#check-all-trash');
+  checkAll.addEventListener('change', () => {
+    el.querySelectorAll('.order-check').forEach(c => c.checked = checkAll.checked);
+    updateTrashBar();
+  });
+  el.querySelectorAll('.order-check').forEach(c => c.addEventListener('change', updateTrashBar));
+
+  function updateTrashBar() {
+    const n = el.querySelectorAll('.order-check:checked').length;
+    document.getElementById('trash-bulk-count').textContent = n;
+    document.getElementById('trash-bulk-bar').classList.toggle('visible', n > 0);
+  }
+
+  // Single restore
+  el.querySelectorAll('[data-restore]').forEach(btn => {
     btn.addEventListener('click', async () => {
       await db.from('orders').update({ deleted_at: null }).eq('id', btn.dataset.restore);
       const ord = allOrders.find(x => String(x.id) === String(btn.dataset.restore));
       if (ord) ord.deleted_at = null;
-      renderTrash();
-      renderOrders(
+      renderTrash(); renderOrders(
         document.getElementById('orders-filter').value,
         document.getElementById('orders-search').value
-      );
-      renderRecentOrders();
-      renderDashboard();
+      ); renderRecentOrders(); renderDashboard();
       toast('Order restored');
     });
   });
 
+  // Single permanent delete
   el.querySelectorAll('[data-perm-delete]').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm('Permanently delete this order? Cannot be undone.')) return;
       await db.from('orders').delete().eq('id', btn.dataset.permDelete);
-      allOrders = allOrders.filter(o => o.id !== btn.dataset.permDelete);
+      allOrders = allOrders.filter(o => String(o.id) !== String(btn.dataset.permDelete));
       renderTrash(); renderDashboard();
       toast('Order permanently deleted');
     });
   });
-}
 
-document.getElementById('empty-trash-btn').onclick = async () => {
-  const deleted = allOrders.filter(o => o.deleted_at);
-  if (!deleted.length) { toast('Trash is already empty'); return; }
-  if (!confirm(`Permanently delete all ${deleted.length} trashed orders?`)) return;
-  for (const o of deleted) {
-    await db.from('orders').delete().eq('id', o.id);
-  }
-  allOrders = allOrders.filter(o => !o.deleted_at);
-  renderTrash(); renderDashboard();
-  toast('Trash emptied');
-};
+  // Bulk restore
+  document.getElementById('trash-bulk-restore').onclick = async () => {
+    const checked = el.querySelectorAll('.order-check:checked');
+    if (!checked.length) return;
+    if (!confirm(`Restore ${checked.length} order(s)?`)) return;
+    for (const c of checked) {
+      await db.from('orders').update({ deleted_at: null }).eq('id', c.dataset.id);
+      const o = allOrders.find(x => String(x.id) === String(c.dataset.id));
+      if (o) o.deleted_at = null;
+    }
+    document.getElementById('trash-bulk-bar').classList.remove('visible');
+    renderTrash(); renderOrders(
+      document.getElementById('orders-filter').value,
+      document.getElementById('orders-search').value
+    ); renderRecentOrders(); renderDashboard();
+    toast(`${checked.length} order(s) restored`);
+  };
+
+  // Bulk permanent delete
+  document.getElementById('trash-bulk-perm').onclick = async () => {
+    const checked = el.querySelectorAll('.order-check:checked');
+    if (!checked.length) return;
+    if (!confirm(`Permanently delete ${checked.length} order(s)? Cannot be undone.`)) return;
+    for (const c of checked) {
+      await db.from('orders').delete().eq('id', c.dataset.id);
+      allOrders = allOrders.filter(o => String(o.id) !== String(c.dataset.id));
+    }
+    document.getElementById('trash-bulk-bar').classList.remove('visible');
+    renderTrash(); renderDashboard();
+    toast(`${checked.length} order(s) permanently deleted`);
+  };
+
+  // Cancel
+  document.getElementById('trash-bulk-cancel').onclick = () => {
+    el.querySelectorAll('.order-check').forEach(c => c.checked = false);
+    checkAll.checked = false;
+    document.getElementById('trash-bulk-bar').classList.remove('visible');
+  };
+}
 
 // ── TOAST ─────────────────────────────────────────────────────
 function toast(msg) {
