@@ -1028,9 +1028,15 @@ function renderAdminsTable(admins) {
   el.querySelectorAll('[data-revoke]').forEach(btn => {
     btn.addEventListener('click', async () => {
       if (!confirm(`Revoke admin access for ${btn.dataset.name}?`)) return;
-      await db.from('customers').update({ is_admin: false, is_super_admin: false }).eq('id', btn.dataset.revoke);
+      const { error } = await db.from('customers')
+        .update({ is_admin: false, is_super_admin: false })
+        .eq('id', btn.dataset.revoke);
+      if (error) { toast('Error: ' + error.message); console.error(error); return; }
       toast('Admin access revoked');
-      loadAdmins();
+      await loadAdmins();
+      // Also update local array so customers page reflects change
+      const c = allCustomers.find(x => x.id === btn.dataset.revoke);
+      if (c) { c.is_admin = false; c.is_super_admin = false; }
     });
   });
 }
