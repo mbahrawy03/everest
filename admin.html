@@ -569,6 +569,7 @@ function buildOrderTable(orders, withSelect) {
     { value: 'delivered',        label: 'Delivered'        },
   ];
   return `<table><thead><tr>
+    <th><input type="checkbox" class="row-check" id="check-all-orders"/></th>
     <th>Order ID</th><th>Customer</th><th>Delivery Info</th><th>Items</th><th>Total</th><th>Status</th><th>Date & Time</th><th></th>
   </tr></thead><tbody>${orders.map(o => {
     const date  = new Date(o.created_at).toLocaleString('en-EG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -576,9 +577,9 @@ function buildOrderTable(orders, withSelect) {
       const detail = [i.size, i.color].filter(Boolean);
       return `${i.name}${detail.length ? ' — ' + detail.join(', ') : ''} ×${i.qty}`;
     }).join('<br>');
-    const name     = o.customers?.full_name || o.customers?.email || 'Guest';
+    const name      = o.customers?.full_name || o.customers?.email || 'Guest';
     const curStatus = o.status || 'pending';
-    const statusEl = withSelect
+    const statusEl  = withSelect
       ? `<select class="status-select" data-id="${o.id}">
            ${STATUS_OPTIONS.map(s => `<option value="${s.value}"${curStatus === s.value ? ' selected' : ''}>${s.label}</option>`).join('')}
          </select>`
@@ -594,6 +595,7 @@ function buildOrderTable(orders, withSelect) {
         <div class="di-addr">${si.address||''}${si.city ? ', '+si.city : ''}</div>
       </div>` : `<span class="no-info">Not submitted yet</span>`;
     return `<tr>
+      <td><input type="checkbox" class="row-check order-check" data-id="${o.id}"/></td>
       <td style="font-family:monospace;font-size:0.78rem">#${o.id.toString().substring(0,8).toUpperCase()}</td>
       <td>${name}<br><span style="font-size:0.75rem;color:var(--muted)">${o.customers?.email||''}</span></td>
       <td style="min-width:170px">${deliveryHtml}</td>
@@ -604,6 +606,53 @@ function buildOrderTable(orders, withSelect) {
       <td><button class="action-btn danger" data-delete-order="${o.id}">🗑</button></td>
     </tr>`;
   }).join('')}</tbody></table>`;
+}
+
+  function wireBulkBar(tableEl, barEl, countEl, trashBtn, cancelBtn) {
+  function updateBar() {
+    const checked = tableEl.querySelectorAll('.order-check:checked');
+    const n = checked.length;
+    countEl.textContent = n;
+    barEl.classList.toggle('visible', n > 0);
+  }
+
+  // Select all checkbox
+  const checkAll = tableEl.querySelector('#check-all-orders');
+  if (checkAll) {
+    checkAll.addEventListener('change', () => {
+      tableEl.querySelectorAll('.order-check').forEach(c => c.checked = checkAll.checked);
+      updateBar();
+    });
+  }
+
+  tableEl.querySelectorAll('.order-check').forEach(c => {
+    c.addEventListener('change', updateBar);
+  });
+
+  trashBtn.onclick = async () => {
+    const checked = tableEl.querySelectorAll('.order-check:checked');
+    if (!checked.length) return;
+    if (!confirm(`Move ${checked.length} order(s) to trash?`)) return;
+    for (const c of checked) {
+      await db.from('orders').update({ deleted_at: new Date().toISOString() }).eq('id', c.dataset.id);
+      const o = allOrders.find(x => String(x.id) === String(c.dataset.id));
+      if (o) o.deleted_at = new Date().toISOString();
+    }
+    barEl.classList.remove('visible');
+    renderOrders(
+      document.getElementById('orders-filter').value,
+      document.getElementById('orders-search').value
+    );
+    renderRecentOrders();
+    renderDashboard();
+    toast(`${checked.length} order(s) moved to trash`);
+  };
+
+  cancelBtn.onclick = () => {
+    tableEl.querySelectorAll('.order-check').forEach(c => c.checked = false);
+    if (checkAll) checkAll.checked = false;
+    barEl.classList.remove('visible');
+  };
 }
     
 function renderOrders(filter='all', search='') {
