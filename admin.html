@@ -490,6 +490,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     if (item.dataset.page === 'add-product') resetProductForm();
     if (item.dataset.page === 'orders') document.getElementById('new-orders-badge').classList.add('hidden');
     if (item.dataset.page === 'trash') renderTrash();
+    if (item.dataset.page === 'admins') loadAdmins();
   });
 });
 document.getElementById('refresh-btn').onclick = loadAll;
