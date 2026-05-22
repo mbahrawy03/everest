@@ -1081,11 +1081,19 @@ function renderTrash() {
   }).join('')}
   </tbody></table>`;
 
-  el.querySelectorAll('[data-restore]').forEach(btn => {
+ el.querySelectorAll('[data-restore]').forEach(btn => {
     btn.addEventListener('click', async () => {
       await db.from('orders').update({ deleted_at: null }).eq('id', btn.dataset.restore);
-      const ord = allOrders.find(x => x.id === btn.dataset.restore);
+      const ord = allOrders.find(x => String(x.id) === String(btn.dataset.restore));
       if (ord) ord.deleted_at = null;
+      renderTrash();
+      renderOrders(
+        document.getElementById('orders-filter').value,
+        document.getElementById('orders-search').value
+      );
+      renderRecentOrders();
+      renderDashboard();
+      toast('Order restored');
     });
   });
 
