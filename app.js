@@ -288,10 +288,11 @@ function renderProducts() {
 
   productGrid.innerHTML = filtered.map(p => {
     const tagHtml = p.tag ? `<span class="card-tag tag-${p.tag}">${p.tag}</span>` : '';
-    const oldPrice = p.tag === 'sale' ? `<span class="old-price">EGP ${(p.price * 1.3).toFixed(0)}</span>` : '';
-    const priceDisplay = p.tag === 'sale'
-      ? `${oldPrice}<span class="sale-price">EGP ${p.price.toLocaleString()}</span>`
-      : `EGP ${p.price.toLocaleString()}`;
+    const oldPrice = p.tag === 'sale' && p.sale_price
+  ? `<span class="old-price">EGP ${p.price.toLocaleString()}</span>` : '';
+const priceDisplay = p.tag === 'sale' && p.sale_price
+  ? `${oldPrice}<span class="sale-price">EGP ${p.sale_price.toLocaleString()}</span>`
+  : `EGP ${p.price.toLocaleString()}`;
     const colors = p.colors || [];
     const colorDots = colors.length > 0
       ? `<div class="color-dots">${colors.slice(0,4).map(c => `<span class="color-dot" style="background:${colorNameToHex(c)}" title="${c}"></span>`).join('')}${colors.length > 4 ? `<span style="font-size:0.7rem;color:var(--muted)">+${colors.length-4}</span>` : ''}</div>`
