@@ -305,7 +305,11 @@ const priceDisplay = p.tag === 'sale' && p.sale_price
         <div class="product-img">
           ${tagHtml}
           ${getMainImage(p)}
-          <div class="card-overlay"><button class="quick-view">Quick View</button></div>
+          <div class="card-overlay">
+            ${isSoldOut
+              ? `<button class="quick-view" style="background:#666;cursor:not-allowed">Sold Out</button>`
+              : `<button class="quick-view">Quick View</button>`}
+          </div>
         </div>
         <div class="card-info">
           <div class="card-cat">${p.category}</div>
