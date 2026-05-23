@@ -635,7 +635,8 @@ function addToCart(product, size, color) {
   else {
     const colorMatch = color && product.color_images?.find(ci => ci.color === color && ci.image);
     const image = colorMatch?.image || product.images?.[0] || product.image_url || null;
-    cart.push({ key, id: product.id, name: product.name, price: product.price, emoji: product.emoji || '👕', image, size, color: color || null, qty: 1 });
+    const actualPrice = (product.tag === 'sale' && product.sale_price) ? product.sale_price : product.price;
+    cart.push({ key, id: product.id, name: product.name, price: actualPrice, emoji: product.emoji || '👕', image, size, color: color || null, qty: 1 });
   }
   saveCart(); updateCartUI(); openCart();
 }
