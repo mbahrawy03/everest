@@ -956,7 +956,9 @@ function resetProductForm() {
   document.getElementById('inventory-card').classList.remove('visible');
   document.getElementById('inventory-grid').innerHTML = '';
   document.getElementById('add-product-title').textContent = 'Add Product';
-  ['p-name','p-price','p-sizes','p-desc','p-emoji'].forEach(id=>document.getElementById(id).value='');
+  ['p-name','p-price','p-sale-price','p-sizes','p-desc','p-emoji'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sale-price-group').style.display = 'none';
+  document.getElementById('sale-info-box').style.display = 'none';
   document.getElementById('p-category').value = '';
   document.getElementById('p-tag').value = '';
   document.getElementById('upload-status').textContent = '';
