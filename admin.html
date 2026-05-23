@@ -1036,11 +1036,13 @@ document.getElementById('save-product-btn').onclick = async () => {
   const images      = colorRows.map(r=>r.image).filter(Boolean);
   const colorImages = colorRows;
 
+  const salePrice = parseFloat(document.getElementById('p-sale-price').value) || null;
   const payload = {
     name, price, category, tag: tag||'', emoji, description: desc, active: true,
     sizes, colors, images, color_images: colorImages,
     image_url: images[0]||null,
-    stock: 0 // will be updated after inventory save
+    sale_price: (tag === 'sale' && salePrice && salePrice < price) ? salePrice : null,
+    stock: 0
   };
 
   saveBtn.textContent = 'Saving...'; saveBtn.disabled = true;
