@@ -287,7 +287,10 @@ function renderProducts() {
   }
 
   productGrid.innerHTML = filtered.map(p => {
-    const tagHtml = p.tag ? `<span class="card-tag tag-${p.tag}">${p.tag}</span>` : '';
+    const isSoldOut = p.stock === 0;
+    const tagHtml = isSoldOut
+      ? `<span class="card-tag" style="background:#1a1a1a;color:white;opacity:0.85">SOLD OUT</span>`
+      : p.tag ? `<span class="card-tag tag-${p.tag}">${p.tag}</span>` : '';
     const oldPrice = p.tag === 'sale' && p.sale_price
   ? `<span class="old-price">EGP ${p.price.toLocaleString()}</span>` : '';
 const priceDisplay = p.tag === 'sale' && p.sale_price
