@@ -1378,7 +1378,30 @@ function renderTrash() {
   };
 }
 
-// ── TOAST ─────────────────────────────────────────────────────
+// ── SALE PRICE TOGGLE ─────────────────────────────────────────
+document.getElementById('p-tag').addEventListener('change', function() {
+  const isSale = this.value === 'sale';
+  document.getElementById('sale-price-group').style.display = isSale ? '' : 'none';
+  document.getElementById('sale-info-box').style.display = isSale ? '' : 'none';
+  updateSaleInfo();
+});
+
+document.getElementById('p-price').addEventListener('input', updateSaleInfo);
+document.getElementById('p-sale-price').addEventListener('input', updateSaleInfo);
+
+function updateSaleInfo() {
+  const box      = document.getElementById('sale-info-box');
+  const original = parseFloat(document.getElementById('p-price').value);
+  const sale     = parseFloat(document.getElementById('p-sale-price').value);
+  if (!original || !sale || sale >= original) {
+    box.textContent = sale >= original ? '⚠️ Sale price must be less than original price.' : '';
+    return;
+  }
+  const pct = Math.round((1 - sale / original) * 100);
+  box.textContent = `✓ ${pct}% off — customer sees EGP ${original.toLocaleString()} crossed out, pays EGP ${sale.toLocaleString()}`;
+}
+  
+  // ── TOAST ─────────────────────────────────────────────────────
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
