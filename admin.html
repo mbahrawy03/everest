@@ -989,6 +989,12 @@ async function startEditProduct(id) {
   document.getElementById('p-category').value = p.category;
   document.getElementById('p-sizes').value    = (p.sizes||[]).join(', ');
   document.getElementById('p-tag').value      = p.tag||'';
+  if (p.tag === 'sale' && p.sale_price) {
+  document.getElementById('p-sale-price').value = p.sale_price;
+  document.getElementById('sale-price-group').style.display = '';
+  document.getElementById('sale-info-box').style.display = '';
+  updateSaleInfo();
+}
   document.getElementById('p-emoji').value    = p.emoji||'';
   document.getElementById('p-desc').value     = p.description||'';
   renderColorPhotoRows();
