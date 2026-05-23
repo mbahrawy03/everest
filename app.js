@@ -321,7 +321,11 @@ const priceDisplay = p.tag === 'sale' && p.sale_price
   }).join('');
 
   productGrid.querySelectorAll('.product-card').forEach(card => {
-    card.addEventListener('click', () => openProduct(card.dataset.id));
+    card.addEventListener('click', () => {
+      const product = allProducts.find(p => String(p.id) === String(card.dataset.id));
+      if (product?.stock === 0) return; // block click on sold out
+      openProduct(card.dataset.id);
+    });
   });
 }
 
