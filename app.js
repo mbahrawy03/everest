@@ -488,7 +488,10 @@ function openProduct(id) {
   document.getElementById('modal-cat').textContent   = currentProduct.category;
   document.getElementById('modal-name').textContent  = currentProduct.name;
   document.getElementById('modal-desc').textContent  = currentProduct.description || '';
-  document.getElementById('modal-price').textContent = `EGP ${currentProduct.price.toLocaleString()}`;
+  const displayPrice = currentProduct.tag === 'sale' && currentProduct.sale_price
+  ? `<span style="text-decoration:line-through;color:var(--muted);font-size:0.9rem;margin-right:0.5rem">EGP ${currentProduct.price.toLocaleString()}</span><span style="color:#c0392b">EGP ${currentProduct.sale_price.toLocaleString()}</span>`
+  : `EGP ${currentProduct.price.toLocaleString()}`;
+document.getElementById('modal-price').innerHTML = displayPrice;
 
   // Images gallery — use color_images if available, else fallback to images[]
   const colorImages = currentProduct.color_images?.filter(ci => ci.image) || [];
